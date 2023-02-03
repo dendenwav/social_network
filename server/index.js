@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
+import passport from './config/passport.js';
+
 const app = express();
 dotenv.config();
 
