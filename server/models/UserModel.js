@@ -1,12 +1,18 @@
 import mongoose from 'mongoose';
 
 const UserSchema = mongoose.Schema(
-    { username: {
+    { pseudo: {
         type: String,
         require: true,
         min: 3,
         max: 20,
         unique: true,
+    },
+    username: {
+        type: String,
+        require: true,
+        min: 3,
+        max: 25,
     },
     email: {
         type: String,

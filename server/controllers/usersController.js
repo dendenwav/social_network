@@ -1,27 +1,65 @@
 import UserModel from '../models/UserModel.js';
 import bcrypt from 'bcrypt';
 
+//get users
+export const getUsers = async (req, res) => {
+    try {
+        const users = await UserModel.find({}, { password: 0, updatedAt: 0 });
+        res.status(200).json(users);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+    }
+};
+
+//get a user
+export const getUser = async (req, res) => {
+    const userId = req.params.id;
+    try {
+        const user = await UserModel.findById(userId);
+
+        if (!user) {            
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const { password, updatedAt, ...other } = user._doc;
+        res.status(200).json(other);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Could not retrieve user" });
+    }
+};
+
 //update user
 export const updateUser = async (req, res) => {
     if (req.body.userId === req.params.id || req.body.isAdmin) {
-        if (req.body.password) {
+        const updates = {};
+        for (const [key, value] of Object.entries(req.body)) {
+            if (key !== "userId" && key !== "isAdmin") {
+                updates[key] = value;
+            }
+        }
+        if (updates.password) {
             try {
                 const salt = await bcrypt.genSalt(10);
-                req.body.password = await bcrypt.hash(req.body.password, salt);
+                updates.password = await bcrypt.hash(updates.password, salt);
             } catch (err) {
-                return res.status(500).json(err);
+                console.error(err);
+                return res.status(500).json({ error: "Could not hash password" });
             }
         }
         try {
             const user = await UserModel.findByIdAndUpdate(req.params.id, {
-                $set: req.body,
+                $set: updates,
             });
-            res.status(200).json("Account has been updated");
+            if (!user) return res.status(404).json({ error: "User not found" });
+            res.status(200).json({ message: "Account has been updated" });
         } catch (err) {
-            return res.status(500).json(err);
+            console.error(err);
+            return res.status(500).json({ error: "Could not update user" });
         }
     } else {
-        return res.status(403).json("You can update only your account!");
+        return res.status(403).json({ error: "You can only update your own account" });
     }
 };
 
@@ -36,29 +74,6 @@ export const deleteUser = async (req, res) => {
         }
     } else {
         return res.status(403).json("You can delete only your account!");
-    }
-};
-
-//get a user
-export const getUser = async (req, res) => {
-    const userId = req.params.id;
-    try {
-        const user = await UserModel.findById(userId);
-        const { password, updatedAt, ...other } = user._doc;
-        res.status(200).json(other);
-    } catch (err) {
-        res.status(500).json(err);
-    }
-};
-
-//get users
-export const getUsers = async (req, res) => {
-    try {
-        const users = await UserModel.find();
-        res.status(200).json(users);
-    } catch (err) {
-        console.log(err);
-        res.status(500).json(err);
     }
 };
 
