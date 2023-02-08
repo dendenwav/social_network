@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 //get users
 export const getUsers = async (req, res) => {
     try {
-        const users = await UserModel.find({}, { password: 0, updatedAt: 0 });
+        const users = await UserModel.find({}, { email: 0, password: 0, updatedAt: 0 });
         res.status(200).json(users);
     } catch (err) {
         console.log(err);
@@ -14,15 +14,13 @@ export const getUsers = async (req, res) => {
 
 //get a user
 export const getUser = async (req, res) => {
-    const userId = req.params.id;
+    const pseudo = req.params.id;
     try {
-        const user = await UserModel.findById(userId);
+        const user = await UserModel.findOne({ pseudo });
 
-        if (!user) {            
-            return res.status(404).json({ error: "User not found" });
-        }
+        if (!user) return res.status(404).json({ error: "User not found" });
 
-        const { password, updatedAt, ...other } = user._doc;
+        const { email, password, updatedAt, ...other } = user._doc;
         res.status(200).json(other);
     } catch (err) {
         console.error(err);
@@ -32,48 +30,71 @@ export const getUser = async (req, res) => {
 
 //update user
 export const updateUser = async (req, res) => {
-    if (req.body.userId === req.params.id || req.body.isAdmin) {
-        const updates = {};
-        for (const [key, value] of Object.entries(req.body)) {
-            if (key !== "userId" && key !== "isAdmin") {
-                updates[key] = value;
+    try {        
+        const currentUser = await UserModel.findOne({ pseudo: req.params.id });
+        const userToUpdate = await UserModel.findOne({ pseudo: req.body.userId });
+
+        if (!userToUpdate) return res.status(404).json({ message: "User not found." });
+
+        if (currentUser.pseudo === userToUpdate.pseudo || currentUser.isAdmin) {
+
+            const updates = {};
+            for (const [key, value] of Object.entries(req.body)) {
+                if (key !== "userId" && key !== "isAdmin") {
+                    updates[key] = value;
+                }
             }
-        }
-        if (updates.password) {
+
+            if (updates.password) {
+                try {
+                    const salt = await bcrypt.genSalt(10);
+                    updates.password = await bcrypt.hash(updates.password, salt);
+                } catch (err) {
+                    console.error(err);
+                    return res.status(500).json({ error: "Could not hash password" });
+                }
+            }
+
             try {
-                const salt = await bcrypt.genSalt(10);
-                updates.password = await bcrypt.hash(updates.password, salt);
+                const userUpdated = await UserModel.findOneAndUpdate({ pseudo: userToUpdate.pseudo }, {
+                    $set: updates,
+                });
+
+                if (!userUpdated) return res.status(404).json({ error: "User not found ? (bizarre...)" });
+
+                res.status(200).json({ message: "Account has been updated" });
+
             } catch (err) {
                 console.error(err);
-                return res.status(500).json({ error: "Could not hash password" });
+                return res.status(500).json({ error: "Could not update user" });
             }
+            
+        } else {
+            return res.status(403).json({ error: "You can only update your own account" });
         }
-        try {
-            const user = await UserModel.findByIdAndUpdate(req.params.id, {
-                $set: updates,
-            });
-            if (!user) return res.status(404).json({ error: "User not found" });
-            res.status(200).json({ message: "Account has been updated" });
-        } catch (err) {
-            console.error(err);
-            return res.status(500).json({ error: "Could not update user" });
-        }
-    } else {
-        return res.status(403).json({ error: "You can only update your own account" });
+    } catch (error) {
+        return res.status(500).json({ message: "An error occurred while updating the user" });
     }
+    
 };
 
 //delete user
-export const deleteUser = async (req, res) => {
-    if (req.body.userId === req.params.id || req.body.isAdmin) {
-        try {
-            await UserModel.findByIdAndDelete(req.params.id);
-            res.status(200).json("Account has been deleted");
-        } catch (err) {
-            return res.status(500).json(err);
+export const deleteUser = async (req, res) => {  
+    try {
+        const currentUser = await UserModel.findOne({ pseudo: req.params.id });
+        const userToDelete = await UserModel.findOne({ pseudo: req.body.userId });
+    
+        if (!userToDelete) return res.status(404).json({ message: "User not found." });
+        if (!currentUser) return res.status(404).json({ message: "Current user doesn't exist." });
+
+        if (currentUser.pseudo === userToDelete.pseudo || currentUser.isAdmin) {
+            await UserModel.findOneAndDelete({ pseudo: userToDelete.pseudo });
+            return res.status(200).json({ message: "Account has been deleted." });
+        } else {
+            return res.status(403).json({ message: "You can delete only your account." });
         }
-    } else {
-        return res.status(403).json("You can delete only your account!");
+    } catch (err) {
+        return res.status(500).json({ message: "An error occurred while deleting the user" });
     }
 };
 
