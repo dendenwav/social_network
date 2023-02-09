@@ -30,8 +30,8 @@ export const getUser = async (req, res) => {
 
 //update user
 export const updateUser = async (req, res) => {
-    try {        
-        const currentUser = await UserModel.findOne({ pseudo: req.params.id });
+    try {
+        const currentUser = await UserModel.findOne({ pseudo: req.user?.pseudo });
         const userToUpdate = await UserModel.findOne({ pseudo: req.body.userId });
 
         if (!userToUpdate) return res.status(404).json({ message: "User not found." });
@@ -74,14 +74,13 @@ export const updateUser = async (req, res) => {
         }
     } catch (error) {
         return res.status(500).json({ message: "An error occurred while updating the user" });
-    }
-    
+    }    
 };
 
 //delete user
 export const deleteUser = async (req, res) => {  
     try {
-        const currentUser = await UserModel.findOne({ pseudo: req.params.id });
+        const currentUser = await UserModel.findOne({ pseudo: req.user?.pseudo });
         const userToDelete = await UserModel.findOne({ pseudo: req.body.userId });
     
         if (!userToDelete) return res.status(404).json({ message: "User not found." });
@@ -101,7 +100,7 @@ export const deleteUser = async (req, res) => {
 //follow a user
 export const followUser = async (req, res) => {
     try {
-        const currentUser = await UserModel.findOne({ pseudo: req.params.id });
+        const currentUser = await UserModel.findOne({ pseudo: req.user?.pseudo });
         const userToFollow = await UserModel.findOne({ pseudo: req.body.userId });
     
         if (!userToFollow) return res.status(404).json({ message: "User not found." });
@@ -126,7 +125,7 @@ export const followUser = async (req, res) => {
 //unfollow a user
 export const unfollowUser = async (req, res) => {    
     try {
-        const currentUser = await UserModel.findOne({ pseudo: req.params.id });
+        const currentUser = await UserModel.findOne({ pseudo: req.user?.pseudo });
         const userToUnfollow = await UserModel.findOne({ pseudo: req.body.userId });
     
         if (!userToUnfollow) return res.status(404).json({ message: "User not found." });
