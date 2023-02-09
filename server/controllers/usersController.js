@@ -100,42 +100,50 @@ export const deleteUser = async (req, res) => {
 
 //follow a user
 export const followUser = async (req, res) => {
-    if (req.body.userId !== req.params.id) {
-        try {
-            const user = await UserModel.findById(req.params.id);
-            const currentUser = await UserModel.findById(req.body.userId);
-            if (!user.followers.includes(req.body.userId)) {
-                await user.updateOne({ $push: { followers: req.body.userId } });
-                await currentUser.updateOne({ $push: { followings: req.params.id } });
-                res.status(200).json("user has been followed");
-            } else {
-                res.status(403).json("you allready follow this user");
-            }
-        } catch (err) {
-            res.status(500).json(err);
+    try {
+        const currentUser = await UserModel.findOne({ pseudo: req.params.id });
+        const userToFollow = await UserModel.findOne({ pseudo: req.body.userId });
+    
+        if (!userToFollow) return res.status(404).json({ message: "User not found." });
+        if (!currentUser) return res.status(404).json({ message: "Current user doesn't exist." });
+
+        if (!currentUser.followings.includes(userToFollow.pseudo) && !userToFollow.followers.includes(currentUser.pseudo)) {
+            await currentUser.updateOne({ $push: { followings: userToFollow.pseudo } });
+            await userToFollow.updateOne({ $push: { followers: currentUser.pseudo } });
+            return res.status(200).json({ message: "User has been followed." });
+        } else if (currentUser.followings.includes(userToFollow.pseudo) && userToFollow.followers.includes(currentUser.pseudo)) {
+            return res.status(403).json({ message: "You already follow this user." });
+        } else {
+            if (currentUser.followings.includes(userToFollow.pseudo)) await currentUser.updateOne({ $pull: { followings: userToFollow.pseudo } });
+            if (userToFollow.followers.includes(currentUser.pseudo)) await userToFollow.updateOne({ $pull: { followers: currentUser.pseudo } });
+            return res.status(500).json({ message: "A data inconsistency has occurred. By default, you won't follow the user you're trying to follow. Please retry the operation if you really want to follow it." });
         }
-    } else {
-        res.status(403).json("you cant follow yourself");
+    } catch (err) {
+        return res.status(500).json({ message: "An error occurred while following to this user." });
     }
 };
 
 //unfollow a user
-export const unfollowUser = async (req, res) => {
-    if (req.body.userId !== req.params.id) {
-        try {
-            const user = await UserModel.findById(req.params.id);
-            const currentUser = await UserModel.findById(req.body.userId);
-            if (user.followers.includes(req.body.userId)) {
-                await user.updateOne({ $pull: { followers: req.body.userId } });
-                await currentUser.updateOne({ $pull: { followings: req.params.id } });
-                res.status(200).json("user has been unfollowed");
-            } else {
-                res.status(403).json("you dont follow this user");
-            }
-        } catch (err) {
-            res.status(500).json(err);
+export const unfollowUser = async (req, res) => {    
+    try {
+        const currentUser = await UserModel.findOne({ pseudo: req.params.id });
+        const userToUnfollow = await UserModel.findOne({ pseudo: req.body.userId });
+    
+        if (!userToUnfollow) return res.status(404).json({ message: "User not found." });
+        if (!currentUser) return res.status(404).json({ message: "Current user doesn't exist." });
+
+        if (currentUser.followings.includes(userToUnfollow.pseudo) && userToUnfollow.followers.includes(currentUser.pseudo)) {
+            await currentUser.updateOne({ $pull: { followings: userToUnfollow.pseudo } });
+            await userToUnfollow.updateOne({ $pull: { followers: currentUser.pseudo } });
+            return res.status(200).json({ message: "User has been unfollowed." });
+        } else if (!currentUser.followings.includes(userToUnfollow.pseudo) && !userToUnfollow.followers.includes(currentUser.pseudo)) {
+            return res.status(403).json({ message: "You already don't follow this user." });
+        } else {
+            if (currentUser.followings.includes(userToUnfollow.pseudo)) await currentUser.updateOne({ $pull: { followings: userToUnfollow.pseudo } });
+            if (userToUnfollow.followers.includes(currentUser.pseudo)) await userToUnfollow.updateOne({ $pull: { followers: currentUser.pseudo } });
+            return res.status(500).json({ message: "A data inconsistency has occurred. By default, you won't follow the user you're trying to follow." });
         }
-    } else {
-        res.status(403).json("you cant unfollow yourself");
+    } catch (err) {
+        return res.status(500).json({ message: "An error occurred while following to this user." });
     }
 };
