@@ -14,7 +14,7 @@ export const getPosts = async (req, res) => {
 
 //get a post
 export const getPost = async (req, res) => {
-    const postId = req.params.id;
+    const postId = req.params.postId;
     try {
         const post = await PostModel.findById(postId);
         
@@ -29,7 +29,7 @@ export const getPost = async (req, res) => {
 
 //get user's posts
 export const getUserPosts = async (req, res) => {
-    const userId = req.params.id;
+    const userId = req.params.userId;
     try {
         const user = await UserModel.findOne({ pseudo: userId });
 
@@ -48,7 +48,7 @@ export const getUserPosts = async (req, res) => {
 
 //get all posts from user and followings
 export const getFriendsPosts = async (req, res) => {
-    const userId = req.params.id;
+    const userId = req.params.userId;
     try {
         const user = await UserModel.findOne({ pseudo: userId });
 

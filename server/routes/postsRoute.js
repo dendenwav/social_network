@@ -6,9 +6,9 @@ import auth from '../middlewares/authMiddleware.js';
 const router = express.Router();
 
 router.get("/", getPosts);
-router.get("/:id", getPost);
-router.get("/user/:id", getUserPosts);
-router.get("/friends/:id", getFriendsPosts);
+router.get("/:postId", getPost);
+router.get("/user/:userId", getUserPosts);
+router.get("/friends/:userId", getFriendsPosts);
 router.post("/", auth, createPost);
 router.put("/", auth, updatePost);
 router.delete("/", auth, deletePost);
