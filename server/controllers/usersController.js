@@ -56,9 +56,7 @@ export const updateUser = async (req, res) => {
             }
 
             try {
-                const userUpdated = await UserModel.findOneAndUpdate({ pseudo: userToUpdate.pseudo }, {
-                    $set: updates,
-                });
+                const userUpdated = await userToUpdate.updateOne({ $set: updates });
 
                 if (!userUpdated) return res.status(404).json({ error: "User not found ? (bizarre...)" });
 
@@ -104,7 +102,8 @@ export const followUser = async (req, res) => {
         const userToFollow = await UserModel.findOne({ pseudo: req.body.userId });
     
         if (!userToFollow) return res.status(404).json({ message: "User not found." });
-        if (!currentUser) return res.status(404).json({ message: "Current user doesn't exist." });
+
+        if (currentUser.pseudo === userToFollow.pseudo) return res.status(403).json({ message: "You can't follow yourself." });
 
         if (!currentUser.followings.includes(userToFollow.pseudo) && !userToFollow.followers.includes(currentUser.pseudo)) {
             await currentUser.updateOne({ $push: { followings: userToFollow.pseudo } });
@@ -129,7 +128,8 @@ export const unfollowUser = async (req, res) => {
         const userToUnfollow = await UserModel.findOne({ pseudo: req.body.userId });
     
         if (!userToUnfollow) return res.status(404).json({ message: "User not found." });
-        if (!currentUser) return res.status(404).json({ message: "Current user doesn't exist." });
+        
+        if (currentUser.pseudo === userToUnfollow.pseudo) return res.status(403).json({ message: "You can't unfollow yourself." });
 
         if (currentUser.followings.includes(userToUnfollow.pseudo) && userToUnfollow.followers.includes(currentUser.pseudo)) {
             await currentUser.updateOne({ $pull: { followings: userToUnfollow.pseudo } });

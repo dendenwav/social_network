@@ -7,11 +7,11 @@ const router = express.Router();
 
 router.get("/", getPosts);
 router.get("/:id", getPost);
-router.get("/:id/user", getUserPosts);
-router.get("/:id/friends", getFriendsPosts);
+router.get("/user/:id", getUserPosts);
+router.get("/friends/:id", getFriendsPosts);
 router.post("/", auth, createPost);
-router.put("/:id", auth, updatePost);
-router.delete("/:id", auth, deletePost);
-router.put("/:id/like", auth, likePost);
+router.put("/", auth, updatePost);
+router.delete("/", auth, deletePost);
+router.put("/like", auth, likePost);
 
 export default router;
