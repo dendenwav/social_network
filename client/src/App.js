@@ -1,7 +1,8 @@
 import React, { useContext } from "react";
 import { BrowserRouter as Router , Routes, Route, Navigate } from "react-router-dom";
 import { AuthorizationProvider, AuthorizationContext } from "./context/AuthorizationContext";
-import Auth from "./pages/Auth/Auth";
+import Register from "./pages/Auth/Register";
+import Login from "./pages/Auth/Login";
 
 function App() {
     const { authorization } = useContext(AuthorizationContext);
@@ -13,13 +14,16 @@ function App() {
             <Router>
                 <Routes>
                     <Route exact path="/" element={
-                        authorization ? <div>Home</div> : <Navigate to="/auth" />                        
+                        authorization ? <div>Home</div> : <Navigate to="/login" />                        
                     }/>
                     <Route exact path="/profile" element={
-                        authorization ? <div>Profile</div> : <Navigate to="/auth" />
-                    }/>        
-                    <Route exact path="/auth" element={
-                        authorization ? <Navigate to="/" /> : <Auth/>
+                        authorization ? <div>Profile</div> : <Navigate to="/login" />
+                    }/>
+                    <Route exact path="/login" element={
+                        authorization ? <Navigate to="/" /> : <Login/>
+                    }/>
+                    <Route exact path="/register" element={
+                        authorization ? <Navigate to="/" /> : <Register/>
                     }/>
                 </Routes>
             </Router>
