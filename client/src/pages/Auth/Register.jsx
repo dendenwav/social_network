@@ -37,8 +37,8 @@ const Register = () => {
         <AuthContainer isSignUp={true}>
             <form className={classes.form} onSubmit={handleSubmit}>
                 <Grid container spacing={2}>
-                    <Input name='pseudo' label='Pseudo' handleChange={handleChange}/>
-                    <Input name='firstName' label='Prénom' handleChange={handleChange} autoFocus half/>
+                    <Input name='pseudo' label='Pseudo' handleChange={handleChange} autoFocus/>
+                    <Input name='firstName' label='Prénom' handleChange={handleChange} half/>
                     <Input name='lastName' label='Nom' handleChange={handleChange} half/>
                     <Input name='email' label='Email' handleChange={handleChange} type="email"/>
                     <Input name='password' label='Mot de Passe' handleChange={handleChange} type={ showPassword ? "text" : "password" } handleShowPassword={handleShowPassword}/>

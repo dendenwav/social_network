@@ -32,7 +32,9 @@ const AuthContainer = ({ isSignUp, children }) => {
                 
                 <Grid container justifyContent='flex-end'>
                     <Grid item>
-                        <Button onClick={switchMode}>Déjà un compte ? Se Connecter</Button>
+                        <Button onClick={switchMode}>
+                            { isSignUp ? `Déjà un compte ? Se Connecter` : 'Pas de compte ? S\'inscrire' }
+                        </Button>
                     </Grid>
                 </Grid>
             </Paper>

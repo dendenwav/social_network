@@ -8,10 +8,12 @@ const Input = ({ name, half, label, handleChange, autoFocus, type, handleShowPas
     return (
         <Grid item xs={12} sm={half ? 6 : 12}>
             <TextField
+                autoComplete='off'
                 name={name}
                 onChange={handleChange}
                 variant='outlined'
                 required
+                size='small'
                 fullWidth
                 label={label}
                 autoFocus={autoFocus}
@@ -19,7 +21,7 @@ const Input = ({ name, half, label, handleChange, autoFocus, type, handleShowPas
                 InputProps={ name === 'password' ? {
                     endAdornment: (
                         <InputAdornment position='end'>
-                            <IconButton onClick={handleShowPassword}>
+                            <IconButton size='small' edge="end" onClick={handleShowPassword}>
                                 {type !== 'password' ? <Visibility/> : <VisibilityOff/>}
                             </IconButton>
                         </InputAdornment>

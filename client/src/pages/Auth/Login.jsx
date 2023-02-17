@@ -35,7 +35,7 @@ const Login = () => {
         <AuthContainer isSignUp={false}>
             <form className={classes.form} onSubmit={handleSubmit}>
                 <Grid container spacing={2}>
-                    <Input name='userId' label='Email ou Pseudo' handleChange={handleChange} />                                    
+                    <Input name='userId' label='Email ou Pseudo' handleChange={handleChange} autoFocus/>                                    
                     <Input name='password' label='Mot de Passe' handleChange={handleChange} type={ showPassword ? "text" : "password" } handleShowPassword={handleShowPassword}/>
                 </Grid>
                 <Button type="submit" fullWidth variant='contained' color='primary' className={classes.submit}>Se Connecter</Button>

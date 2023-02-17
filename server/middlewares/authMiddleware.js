@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const auth = (req, res, next) => {
+const auth = (req, res, next) => {    
     if (!req.cookies) {
         return res.status(401).json({ message: 'Unauthorized: Token is missing.' });
     }
@@ -16,6 +16,7 @@ const auth = (req, res, next) => {
         req.user = { pseudo: decodedToken.pseudo, email: decodedToken.email, id: decodedToken.id };
         next();
     } catch (err) {
+        console.log(err);
         return res.status(401).json({ message: 'Unauthorized: Invalid token.' });
     }
 };

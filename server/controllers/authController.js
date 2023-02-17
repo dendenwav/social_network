@@ -125,3 +125,8 @@ export const loginUser = async (req, res) => {
         res.status(500).json({ message: 'Login failed. Please try again later.' });
     }
 };
+
+// CHECK AUTH
+export const checkAuth = async (req, res) => {
+    res.status(200).json({ pseudo: req.user.pseudo });
+}

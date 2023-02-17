@@ -8,16 +8,11 @@ export default makeStyles((theme) => ({
         alignItems: 'center',
         padding: theme.spacing(2),
     },
-    root: {
-        '& .MuiTextField-root': {
-            margin: theme.spacing(1),
-        },
-    },
     avatar: {
-        marginRight: theme.spacing(1),
+        marginRight: theme.spacing(0.5),
     },
     header: {
-        padding: theme.spacing(2),
+        margin: theme.spacing(1.5, 0, 4),
     },
     title: {
         padding: theme.spacing(0, 1),
@@ -26,10 +21,7 @@ export default makeStyles((theme) => ({
         width: '100%', // Fix IE 11 issue.
     },
     submit: {
-        margin: theme.spacing(3, 0, 2),
-    },
-    googleButton: {
-        marginBottom: theme.spacing(2),
+        margin: theme.spacing(3, 0, 1.5),
     },
     passwordStrengthBar: {
         width: '100%',

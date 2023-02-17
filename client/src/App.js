@@ -1,33 +1,36 @@
-import React, { useContext } from "react";
-import { BrowserRouter as Router , Routes, Route, Navigate } from "react-router-dom";
-import { AuthorizationProvider, AuthorizationContext } from "./context/AuthorizationContext";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
+import { checkAuth } from "./actions/authActions";
 
 function App() {
-    const { authorization } = useContext(AuthorizationContext);
+    const dispatch = useDispatch();
+    const location = useLocation();
+    let auth = useSelector(state => state.auth);
 
-    console.log(authorization);
+    useEffect(() => {
+        dispatch(checkAuth());
+    }, [dispatch, location]);
+    
+    console.log(auth.userId);
 
     return (
-        <AuthorizationProvider>
-            <Router>
-                <Routes>
-                    <Route exact path="/" element={
-                        authorization ? <div>Home</div> : <Navigate to="/login" />                        
-                    }/>
-                    <Route exact path="/profile" element={
-                        authorization ? <div>Profile</div> : <Navigate to="/login" />
-                    }/>
-                    <Route exact path="/login" element={
-                        authorization ? <Navigate to="/" /> : <Login/>
-                    }/>
-                    <Route exact path="/register" element={
-                        authorization ? <Navigate to="/" /> : <Register/>
-                    }/>
-                </Routes>
-            </Router>
-        </AuthorizationProvider>
+        <Routes>
+            <Route exact path="/" element={
+                auth.userId ? <div>Home</div> : <Navigate to="/login" />                        
+            }/>
+            <Route exact path="/profile" element={
+                auth.userId ? <div>Profile</div> : <Navigate to="/login" />
+            }/>
+            <Route exact path="/login" element={
+                auth.userId ? <Navigate to="/" /> : <Login/>
+            }/>
+            <Route exact path="/register" element={
+                auth.userId ? <Navigate to="/" /> : <Register/>
+            }/>
+        </Routes>
     );
 }
 
