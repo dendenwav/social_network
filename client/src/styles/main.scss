@@ -1,0 +1,18 @@
+@import 'base/variable';
+@import 'base/fonts';
+@import 'base/icons';
+@import 'base/colors';
+@import 'base/shadows';
+@import 'base/borders';
+
+body {
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: theme('colors.element.light.lighter.400');
+    min-height: 100vh;
+
+    main {
+        height: calc(100vh - 1.5rem);
+    }
+}

@@ -1,0 +1,6 @@
+// Borders
+
+$border-normal: var(--border-width) solid var(--base-400) !default;
+$border-hover: var(--border-width) solid var(--base-900) !default;
+$border-focus: var(--border-width) solid var(--primary) !default;
+$border-disabled: var(--border-width) solid var(--base-300) !default;
