@@ -1,40 +1,36 @@
 @import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&family=Roboto:wght@100;300;400;700;900&display=swap");
-[class^='roboto-'],
-[class*=' roboto-'] {
-  font-family: 'Roboto', sans-serif; }
+:root {
+  --font-roboto: 'Roboto', sans-serif;
+  --font-comfortaa: 'Comfortaa', sans-serif;
+  --font-thin: 100;
+  --font-light: 300;
+  --font-regular: 400;
+  --font-bold: 700;
+  --font-black: 900; }
+
+* {
+  font-family: 'Roboto', sans-serif !important; }
 
 [class^='comfortaa-'],
 [class*=' comfortaa-'] {
-  font-family: 'Comfortaa', sans-serif; }
+  font-family: 'Comfortaa', sans-serif !important; }
 
-[class^='roboto-thin'],
-[class*=' roboto-thin'] {
-  font-weight: 100; }
+[class^='thin'],
+[class*=' thin'] {
+  font-weight: var(--font-thin) !important; }
 
-[class^='roboto-light'],
-[class*=' roboto-light'] {
-  font-weight: 300; }
+[class^='light'],
+[class*=' light'] {
+  font-weight: var(--font-light) !important; }
 
-[class^='roboto-regular'],
-[class*=' roboto-regular'] {
-  font-weight: 400; }
+[class^='regular'],
+[class*=' regular'] {
+  font-weight: var(--font-regular) !important; }
 
-[class^='roboto-bold'],
-[class*=' roboto-bold'] {
-  font-weight: 700; }
+[class^='bold'],
+[class*=' bold'] {
+  font-weight: var(--font-bold) !important; }
 
-[class^='roboto-black'],
-[class*=' roboto-black'] {
-  font-weight: 900; }
-
-[class^='comfortaa-light'],
-[class*=' comfortaa-light'] {
-  font-weight: 300; }
-
-[class^='comfortaa-regular'],
-[class*=' comfortaa-regular'] {
-  font-weight: 400; }
-
-[class^='comfortaa-bold'],
-[class*=' comfortaa-bold'] {
-  font-weight: 700; }
+[class^='black'],
+[class*=' black'] {
+  font-weight: var(--font-black) !important; }

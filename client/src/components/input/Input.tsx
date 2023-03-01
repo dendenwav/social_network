@@ -15,6 +15,7 @@ const Input = ({ name, half, label, handleChange, autoFocus, type, handleShowPas
     return (
         <Grid item xs={12} sm={half ? 6 : 12}>
             <TextField
+                color='secondary'
                 autoComplete='off'
                 name={name}
                 onChange={handleChange}

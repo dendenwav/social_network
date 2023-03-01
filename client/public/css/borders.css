@@ -1,0 +1,5 @@
+:root {
+  --border-normal: var(--border-width) solid var(--base-400);
+  --border-hover: var(--border-width) solid var(--base-900);
+  --border-focus: var(--border-width) solid var(--primary);
+  --border-disabled: var(--border-width) solid var(--base-300); }

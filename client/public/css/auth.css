@@ -1,0 +1,71 @@
+:root {
+  --overlay-width: 40%;
+  --form-width: 60;
+  --time-slide-transition: .8s;
+  --button-transition: 
+		color .2s linear, 
+		border-color .2s linear, 
+		background-color .2s linear;
+  --change-formside-transition: 
+		transform var(--time-slide-transition) ease-in-out, 
+		z-index 0s calc(var(--time-slide-transition) / 2);
+  --change-overlayside-transition:        
+		left calc(var(--time-slide-transition) / 2) calc(var(--time-slide-transition) / 2),
+		right calc(var(--time-slide-transition) / 2);
+  --change-overlayside-transition-bis:        
+		right calc(var(--time-slide-transition) / 2) calc(var(--time-slide-transition) / 2),
+        left calc(var(--time-slide-transition) / 2); }
+
+#auth-container {
+  position: relative;
+  margin: 4rem 0;
+  height: calc(100vh - 8rem);
+  border-radius: 1rem;
+  overflow: hidden; }
+  #auth-container .sign-in-container,
+  #auth-container .sign-up-container {
+    position: absolute;
+    left: var(--overlay-width);
+    width: calc(100% - var(--overlay-width));
+    height: 100%;
+    background-color: var(--white);
+    padding: 0 5rem;
+    transform: translateX(0px);
+    transition: var(--change-formside-transition); }
+  #auth-container .header {
+    white-space: nowrap;
+    font-size: 60px;
+    font-family: var(--font-comfortaa) !important;
+    font-weight: var(--font-regular); }
+  #auth-container .sign-in-container {
+    z-index: 1; }
+  #auth-container .sign-up-container {
+    z-index: 2; }
+  #auth-container #overlay-container {
+    position: absolute;
+    left: 0px;
+    right: calc(100% - var(--overlay-width));
+    width: auto;
+    padding: 0 5rem;
+    height: 100%;
+    overflow: hidden;
+    background: var(--primary-darker);
+    z-index: 100; }
+    #auth-container #overlay-container > * {
+      opacity: 1;
+      transition: opacity calc(var(--time-slide-transition) / 2) ease-in-out; }
+      #auth-container #overlay-container > *.switch-animation {
+        opacity: 0; }
+  #auth-container:not(.right-panel-active) #overlay-container {
+    transition: var(--change-overlayside-transition-bis); }
+  #auth-container.right-panel-active .sign-in-container,
+  #auth-container.right-panel-active .sign-up-container {
+    transform: translateX(calc(0px - (var(--overlay-width) / var(--form-width)) * 100)); }
+  #auth-container.right-panel-active .sign-in-container {
+    z-index: 2; }
+  #auth-container.right-panel-active .sign-up-container {
+    z-index: 1; }
+  #auth-container.right-panel-active #overlay-container {
+    transition: var(--change-overlayside-transition);
+    left: calc(100% - var(--overlay-width));
+    right: 0px; }

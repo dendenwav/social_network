@@ -1,18 +1,36 @@
 @import 'base/variable';
 @import 'base/fonts';
-@import 'base/icons';
 @import 'base/colors';
 @import 'base/shadows';
 @import 'base/borders';
 
+*,
+*::before,
+*::after {
+    margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	text-decoration: none;
+	outline: none;
+	list-style: none;
+}
+
 body {
     overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background: theme('colors.element.light.lighter.400');
     min-height: 100vh;
+    display: flow-root;
+    background-color: var(--white);
 
-    main {
-        height: calc(100vh - 1.5rem);
+    #root {
+        display: flow-root;
+        
+        main {
+            height: 100vh;
+            display: flow-root;
+        }
     }
+    
 }
+
+@import 'components/paper';
+@import 'pages/auth';
