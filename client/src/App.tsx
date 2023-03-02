@@ -24,10 +24,10 @@ function App() {
         palette: {
             primary: {
                 main: '#E5383B',
-              },
-              secondary: {
-                main: '#161A1D',
-              },
+            },
+            secondary: {
+                main: '#000A0A',
+            },
         },
     });
 

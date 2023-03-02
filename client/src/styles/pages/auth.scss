@@ -23,6 +23,7 @@
     height: calc(100vh - 8rem);
 	border-radius: 1rem;
 	overflow: hidden;
+    background-color: var(--white);
 
     .sign-in-container,
     .sign-up-container {
@@ -38,7 +39,7 @@
 
     .header {
         white-space: nowrap;
-        font-size: 60px;
+        font-size: 48px;
         font-family: var(--font-comfortaa) !important;
         font-weight: var(--font-regular);
     }
@@ -56,10 +57,9 @@
         left: 0px;
         right: calc(100% - var(--overlay-width));
         width: auto;
-        padding: 0 5rem;
         height: 100%;
         overflow: hidden;
-        background: var(--primary-darker);
+        background: var(--light-grey);
         z-index: 100;
         
         & > * {

@@ -21,7 +21,8 @@
   margin: 4rem 0;
   height: calc(100vh - 8rem);
   border-radius: 1rem;
-  overflow: hidden; }
+  overflow: hidden;
+  background-color: var(--white); }
   #auth-container .sign-in-container,
   #auth-container .sign-up-container {
     position: absolute;
@@ -34,7 +35,7 @@
     transition: var(--change-formside-transition); }
   #auth-container .header {
     white-space: nowrap;
-    font-size: 60px;
+    font-size: 48px;
     font-family: var(--font-comfortaa) !important;
     font-weight: var(--font-regular); }
   #auth-container .sign-in-container {
@@ -46,10 +47,9 @@
     left: 0px;
     right: calc(100% - var(--overlay-width));
     width: auto;
-    padding: 0 5rem;
     height: 100%;
     overflow: hidden;
-    background: var(--primary-darker);
+    background: var(--light-grey);
     z-index: 100; }
     #auth-container #overlay-container > * {
       opacity: 1;

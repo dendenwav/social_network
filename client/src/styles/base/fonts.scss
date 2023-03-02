@@ -14,32 +14,38 @@
     font-family: 'Roboto', sans-serif !important;
 }
 
-[class^='comfortaa-'],
-[class*=' comfortaa-'] {
+[class^='comfortaa'],
+[class*=' comfortaa'],
+.comfortaa {
     font-family: 'Comfortaa', sans-serif !important;
 }
 
 [class^='thin'],
-[class*=' thin'] {
+[class*=' thin'],
+.thin {
     font-weight: var(--font-thin) !important;
 }
 
 [class^='light'],
-[class*=' light'] {
+[class*=' light'],
+.light {
     font-weight: var(--font-light) !important;
 }
 
 [class^='regular'],
-[class*=' regular'] {
+[class*=' regular'],
+.regular {
     font-weight: var(--font-regular) !important;
 }
 
 [class^='bold'],
-[class*=' bold'] {
+[class*=' bold'],
+.bold {
     font-weight: var(--font-bold) !important;
 }
 
 [class^='black'],
-[class*=' black'] {
+[class*=' black'],
+.black {
     font-weight: var(--font-black) !important;
 }

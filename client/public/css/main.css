@@ -11,33 +11,41 @@
 * {
   font-family: 'Roboto', sans-serif !important; }
 
-[class^='comfortaa-'],
-[class*=' comfortaa-'] {
+[class^='comfortaa'],
+[class*=' comfortaa'],
+.comfortaa {
   font-family: 'Comfortaa', sans-serif !important; }
 
 [class^='thin'],
-[class*=' thin'] {
+[class*=' thin'],
+.thin {
   font-weight: var(--font-thin) !important; }
 
 [class^='light'],
-[class*=' light'] {
+[class*=' light'],
+.light {
   font-weight: var(--font-light) !important; }
 
 [class^='regular'],
-[class*=' regular'] {
+[class*=' regular'],
+.regular {
   font-weight: var(--font-regular) !important; }
 
 [class^='bold'],
-[class*=' bold'] {
+[class*=' bold'],
+.bold {
   font-weight: var(--font-bold) !important; }
 
 [class^='black'],
-[class*=' black'] {
+[class*=' black'],
+.black {
   font-weight: var(--font-black) !important; }
 
 :root {
-  --white: #ffffff;
-  --black: #000000;
+  --white: #F5FFFF;
+  --black: #000A0A;
+  --light-grey: #D7E1E1;
+  --dark-grey: #3E4848;
   --base-50: #f0edf7;
   --base-100: #cbc8d3;
   --base-200: #a8a5af;
@@ -113,7 +121,8 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   display: flow-root;
-  background-color: var(--white); }
+  background-color: var(--white);
+  color: var(--black); }
   body #root {
     display: flow-root; }
     body #root main {
@@ -143,7 +152,8 @@ body {
   margin: 4rem 0;
   height: calc(100vh - 8rem);
   border-radius: 1rem;
-  overflow: hidden; }
+  overflow: hidden;
+  background-color: var(--white); }
   #auth-container .sign-in-container,
   #auth-container .sign-up-container {
     position: absolute;
@@ -156,7 +166,7 @@ body {
     transition: var(--change-formside-transition); }
   #auth-container .header {
     white-space: nowrap;
-    font-size: 60px;
+    font-size: 48px;
     font-family: var(--font-comfortaa) !important;
     font-weight: var(--font-regular); }
   #auth-container .sign-in-container {
@@ -168,10 +178,9 @@ body {
     left: 0px;
     right: calc(100% - var(--overlay-width));
     width: auto;
-    padding: 0 5rem;
     height: 100%;
     overflow: hidden;
-    background: var(--primary-darker);
+    background: var(--light-grey);
     z-index: 100; }
     #auth-container #overlay-container > * {
       opacity: 1;

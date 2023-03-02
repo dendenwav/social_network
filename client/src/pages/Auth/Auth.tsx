@@ -1,20 +1,38 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Paper, Button, Grid, Typography } from '@mui/material';
+import { Login, PersonAdd } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import PasswordStrengthBar from 'react-password-strength-bar';
 
 import { loginUser, registerUser } from '../../actions/authActions';
 import Input from '../../components/input/Input';
 
-const initialStateLogin = { userId: '', password: '' }
-const initialStateRegister = { pseudo: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '' }
+const initialStateLogin = { userId: '', password: '' };
+const initialStateRegister = { pseudo: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '' };
+
+const LoginOverlayHeader = 'Bonjour !';
+const LoginOverlayText = 'Renseignez vos identifiants pour vous connecter à votre compte Plugger.';
+const LoginOverlayQuestionText = 'Vous n\'avez pas de compte ?';
+const LoginOverlayButtonContent = 'Inscrivez-vous';
+const LoginOverlayContent = [ LoginOverlayHeader, LoginOverlayText, LoginOverlayQuestionText, LoginOverlayButtonContent ];
+
+const RegisterOverlayHeader = 'Bienvenue !';
+const RegisterOverlayText = 'Renseignez vos informations pour créer votre compte Plugger.';
+const RegisterOverlayQuestionText = 'Vous avez déjà un compte ?';
+const RegisterOverlayButtonContent = 'Connectez-vous';
+const RegisterOverlayContent = [ RegisterOverlayHeader, RegisterOverlayText, RegisterOverlayQuestionText, RegisterOverlayButtonContent ];
 
 const Auth = () => {
     const [loginForm, setLoginForm] = useState(initialStateLogin);
     const [registerForm, setRegisterForm] = useState(initialStateRegister);
     const [password, setPassword] = useState('');
     const [ showPassword, setShowPassword ] = useState(false);
+    const [ showLoginOverlay, setshowloginOverlay ] = useState(false);
+
+    const container = document.getElementById('auth-container');
+    const overlayContainerChildrens = document.getElementById('overlay-container')?.children;
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -27,7 +45,7 @@ const Auth = () => {
     const handleSubmitRegister = async (e: React.SyntheticEvent) => {
         e.preventDefault();
         await registerUser(registerForm, dispatch);
-        navigate('/');
+        navigate('/'); // to do: redirect to creation of profile ?
     };
 
     const handleChangeLogin = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,12 +61,8 @@ const Auth = () => {
         setShowPassword((prevShowPassword) => !prevShowPassword)
     };
 
-    const switchPanel = async () => {
-        const container = document.getElementById('auth-container');
-        const switchButton = document.getElementById('switch-button');
-        const overlayContainerChildrens = document.getElementById('overlay-container')?.children;
-        
-        if (container && switchButton && overlayContainerChildrens) {
+    const switchPanel = async () => {        
+        if (container && overlayContainerChildrens) {
             container.classList.toggle("right-panel-active");
 
             for (let children of overlayContainerChildrens) {
@@ -57,7 +71,7 @@ const Auth = () => {
             }
 
             await new Promise(resolve => setTimeout(resolve, 400));
-            switchButton.innerHTML = (switchButton?.innerHTML === 'S\'inscrire') ? 'Se Connecter' : 'S\'inscrire';
+            setshowloginOverlay(!showLoginOverlay);
 
             for (let children of overlayContainerChildrens) {
                 if (!children.classList.contains('switch-animation')) continue;
@@ -67,12 +81,15 @@ const Auth = () => {
     };
 
     return (
-        <Paper elevation={2} id='auth-container'>
-            <Grid container className='sign-in-container'>
-                <Grid item xs={12} marginTop={15} textAlign='center'>
+        <Paper variant="outlined" id='auth-container'>
+            <Grid container className='sign-in-container' alignContent='center'>
+                <Grid item xs={1}>
+                    <Login className='header'/>
+                </Grid>
+                <Grid item xs={11} paddingLeft={2} marginBottom={3}>
                     <Typography className='header' variant='h1'>Se Connecter</Typography>
                 </Grid>
-                <Grid item xs={12} height={400}>
+                <Grid item xs={12}>
                     <form onSubmit={handleSubmitLogin}>
                         <Grid container spacing={1}>
                             <Input name='userId' label='Email ou Pseudo' handleChange={handleChangeLogin} autoFocus/>                                    
@@ -84,11 +101,14 @@ const Auth = () => {
                     </form>
                 </Grid>
             </Grid>
-            <Grid container className='sign-up-container'>
-                <Grid item xs={12} marginTop={15} textAlign='center'>
+            <Grid container className='sign-up-container' alignContent='center'>
+                <Grid item xs={1}>
+                    <PersonAdd className='header'/>
+                </Grid>
+                <Grid item xs={11} paddingLeft={2} marginBottom={3}>
                     <Typography className='header' variant='h1'>S'inscrire</Typography>
                 </Grid>
-                <Grid item xs={12} height={490}>
+                <Grid item xs={12}>
                     <form onSubmit={handleSubmitRegister}>
                         <Grid container spacing={1}>
                             <Input name='pseudo' label='Pseudo' handleChange={handleChangeRegister} autoFocus/>
@@ -107,8 +127,23 @@ const Auth = () => {
                     </form>
                 </Grid>
             </Grid>
-            <Grid container id='overlay-container' justifyContent='center' alignItems='center' color='primary'>
-                <Button type="button" fullWidth variant="outlined" color='primary' onClick={switchPanel} id="switch-button">Se Connecter</Button>
+            <Grid container id='overlay-container' alignContent='center' justifyContent='center' paddingX={3}>
+                <Grid item>
+                    <Grid container maxWidth={350}>
+                        <Grid item xs={12} marginBottom={3} textAlign='center'>
+                            <Typography variant='h4' id='overlay-title'>{showLoginOverlay ? LoginOverlayContent[0] : RegisterOverlayContent[0]}</Typography>
+                        </Grid>
+                        <Grid item xs={12} alignSelf='center' textAlign='justify'>
+                            <Typography variant='body1' id='overlay-text'>{showLoginOverlay ? LoginOverlayContent[1] : RegisterOverlayContent[1]}</Typography>
+                        </Grid> 
+                        <Grid item xs={12} textAlign='justify' marginTop={3} marginBottom={1}>
+                            <Typography variant='body2'id="overlay-question">{showLoginOverlay ? LoginOverlayContent[2] : RegisterOverlayContent[2]}</Typography>
+                        </Grid> 
+                        <Grid item xs={12}>
+                            <Button type="button" fullWidth variant="outlined" color='secondary' onClick={switchPanel} id="switch-button">{showLoginOverlay ? LoginOverlayContent[3] : RegisterOverlayContent[3]}</Button>
+                        </Grid>
+                    </Grid>
+                </Grid>
             </Grid>
         </Paper>
     )

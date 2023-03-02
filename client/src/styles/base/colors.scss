@@ -1,7 +1,9 @@
-// https://coolors.co/0b090a-161a1d-660708-a4161a-ba181b-e5383b-b1a7a6-d3d3d3-f5f3f4-ffffff
+// https://coolors.co/000a0a-3e4848-d7e1e1-f5ffff-f8c9ca-e5383b-732123
 
-$white: #ffffff !default;
-$black: #000000 !default;
+$white: #F5FFFF !default;
+$black: #000A0A !default;
+$light-grey: #D7E1E1 !default;
+$dark-grey: #3E4848 !default;
 
 $base-50: #f0edf7 !default;
 $base-100: #cbc8d3 !default;
@@ -58,6 +60,8 @@ $transparent: transparent !default;
 :root {
     --white: #{$white};
     --black: #{$black};
+    --light-grey: #{$light-grey};
+    --dark-grey: #{$dark-grey};
 
     --base-50: #{$base-50};
     --base-100: #{$base-100};
