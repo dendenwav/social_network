@@ -44,6 +44,7 @@
 :root {
   --white: #F5FFFF;
   --black: #000A0A;
+  --lighter-grey: #EEF8F8;
   --light-grey: #D7E1E1;
   --dark-grey: #3E4848;
   --base-50: #f0edf7;
@@ -128,6 +129,47 @@ body {
     body #root main {
       height: 100vh;
       display: flow-root; }
+
+.search-container,
+.topbar-container,
+.topbar-placeholder {
+  height: 50px !important; }
+
+.topbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--white);
+  color: var(--black);
+  border-bottom: 1px solid var(--light-grey);
+  z-index: 1000;
+  padding: 0 20px 0 5px; }
+  .topbar-container > * {
+    z-index: 1002; }
+  .topbar-container .logo-link {
+    border-radius: .5rem;
+    padding: .25rem 1rem;
+    border: 1px solid var(--white);
+    transition: all .2s ease-in-out; }
+    .topbar-container .logo-link .logo {
+      width: 32px; }
+    .topbar-container .logo-link:hover {
+      background-color: var(--lighter-grey);
+      border: 1px solid var(--light-grey); }
+
+.search-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 4px 5rem;
+  z-index: 10001; }
+  .search-container .search-bar {
+    border-radius: .5rem;
+    display: flex;
+    width: 600px;
+    border: 1px solid var(--secondary); }
 
 :root {
   --overlay-width: 40%;

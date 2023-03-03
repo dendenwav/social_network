@@ -2,6 +2,7 @@
 
 $white: #F5FFFF !default;
 $black: #000A0A !default;
+$lighter-grey: #EEF8F8 !default;
 $light-grey: #D7E1E1 !default;
 $dark-grey: #3E4848 !default;
 
@@ -60,6 +61,7 @@ $transparent: transparent !default;
 :root {
     --white: #{$white};
     --black: #{$black};
+    --lighter-grey: #{$lighter-grey};
     --light-grey: #{$light-grey};
     --dark-grey: #{$dark-grey};
 

@@ -30,9 +30,6 @@ const Auth = () => {
     const [ showPassword, setShowPassword ] = useState(false);
     const [ showLoginOverlay, setshowloginOverlay ] = useState(false);
 
-    const container = document.getElementById('auth-container');
-    const overlayContainerChildrens = document.getElementById('overlay-container')?.children;
-
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -61,7 +58,10 @@ const Auth = () => {
         setShowPassword((prevShowPassword) => !prevShowPassword)
     };
 
-    const switchPanel = async () => {        
+    const switchPanel = async () => {
+        const container = document.getElementById('auth-container');
+        const overlayContainerChildrens = document.getElementById('overlay-container')?.children;
+        
         if (container && overlayContainerChildrens) {
             container.classList.toggle("right-panel-active");
 
@@ -77,6 +77,8 @@ const Auth = () => {
                 if (!children.classList.contains('switch-animation')) continue;
                 children.classList.remove('switch-animation');
             }
+        } else {
+            console.log('container or overlayContainerChildrens is undefined');
         }
     };
 

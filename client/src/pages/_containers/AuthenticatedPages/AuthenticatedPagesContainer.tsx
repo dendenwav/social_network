@@ -1,4 +1,5 @@
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
+import Topbar from "../../../components/topbar/Topbar";
 
 type AuthenticatedPagesContainerProps = {
     children: ReactJSXElement
@@ -6,11 +7,11 @@ type AuthenticatedPagesContainerProps = {
 
 const AuthenticatedPagesContainer = ({ children }: AuthenticatedPagesContainerProps) => {
     return (
-        <div>
-
+        <>
+            <Topbar/>
             {children}
 
-        </div>
+        </>
     )
 };
 
