@@ -30,3 +30,4 @@ const authRoot = '/auth';
 export const registerUser = (newUser: Interfaces.IRegisterUser) => API.post(`${authRoot}/register`, newUser, { withCredentials: true });
 export const loginUser = (existingUser: Interfaces.IUser) => API.post(`${authRoot}/login`, existingUser, { withCredentials: true });
 export const checkAuth = () => API.get(`${authRoot}/`, { withCredentials: true });
+export const logoutUser = () => API.get(`${authRoot}/logout`, { withCredentials: true });

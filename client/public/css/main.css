@@ -147,14 +147,14 @@ body {
   padding: 0 20px 0 5px; }
   .topbar-container > * {
     z-index: 1002; }
-  .topbar-container .logo-link {
+  .topbar-container .link {
     border-radius: .5rem;
     padding: .25rem 1rem;
     border: 1px solid var(--white);
     transition: all .2s ease-in-out; }
-    .topbar-container .logo-link .logo {
+    .topbar-container .link .logo {
       width: 32px; }
-    .topbar-container .logo-link:hover {
+    .topbar-container .link:hover {
       background-color: var(--lighter-grey);
       border: 1px solid var(--light-grey); }
 
@@ -170,6 +170,11 @@ body {
     display: flex;
     width: 600px;
     border: 1px solid var(--secondary); }
+
+.dialog-close-button {
+  position: absolute !important;
+  right: .75rem;
+  top: 12px; }
 
 :root {
   --overlay-width: 40%;

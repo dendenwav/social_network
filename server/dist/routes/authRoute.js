@@ -9,5 +9,6 @@ const authMiddleware_1 = __importDefault(require("../middlewares/authMiddleware"
 const router = express_1.default.Router();
 router.post("/register", authController_1.registerUser);
 router.post("/login", authController_1.loginUser);
+router.get("/logout", authMiddleware_1.default, authController_1.logoutUser);
 router.get("/", authMiddleware_1.default, authController_1.checkAuth);
 exports.default = router;

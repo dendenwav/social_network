@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { Paper, Button, Grid, Typography } from '@mui/material';
 import { Login, PersonAdd } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import PasswordStrengthBar from 'react-password-strength-bar';
+import { useSnackbar } from 'notistack';
 
-import { loginUser, registerUser } from '../../actions/authActions';
+import { LoginUser, RegisterUser } from '../../actions/authActions';
 import Input from '../../components/input/Input';
+import { useAppDispatch } from '../../hooks';
 
 const initialStateLogin = { userId: '', password: '' };
 const initialStateRegister = { pseudo: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '' };
@@ -30,18 +31,19 @@ const Auth = () => {
     const [ showPassword, setShowPassword ] = useState(false);
     const [ showLoginOverlay, setshowloginOverlay ] = useState(false);
 
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
+    const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
 
     const handleSubmitLogin = async (e: React.SyntheticEvent) => {
         e.preventDefault();
-        await loginUser(loginForm, dispatch);
+        await LoginUser(loginForm, dispatch, enqueueSnackbar);
         navigate('/');
     };
 
     const handleSubmitRegister = async (e: React.SyntheticEvent) => {
         e.preventDefault();
-        await registerUser(registerForm, dispatch);
+        await RegisterUser(registerForm,  dispatch, enqueueSnackbar);
         navigate('/'); // to do: redirect to creation of profile ?
     };
 
