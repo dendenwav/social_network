@@ -17,7 +17,7 @@ const authReducer = (state = initialState, action: AuthActionsInterfaces.IAuthAc
             console.log(LOGOUT);
             return { 
                 ...state, 
-                userId: null 
+                userId: ''
             };
         default:
             return state;

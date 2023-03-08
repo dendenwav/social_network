@@ -9,6 +9,7 @@ import { IRootState } from "./reducers/_interfaces";
 import Auth from "./pages/Auth/Auth";
 import Home from "./pages/Home/Home";
 import Profile from "./pages/Profile/Profile";
+import Loading from "./pages/Loading/Loading";
 
 function App() {
     const dispatch = useAppDispatch();
@@ -32,23 +33,34 @@ function App() {
         },
     });
 
+    if (userId === null) {
+        return (
+            <Container component="main" maxWidth="lg" className='main'>
+                <ThemeProvider theme={theme}>
+                    <Loading/>
+                </ThemeProvider>
+            </Container>
+        );
+    }
+    
     return (
         <Container component="main" maxWidth="lg" className='main'>
             <ThemeProvider theme={theme}>
                 <Routes>
                     <Route path="/" element={
-                        userId ? <Home/> : <Navigate to="/auth" />
+                        userId !== '' ? <Home/> : <Navigate to="/auth" />
                     }/>
                     <Route path="/profile" element={
-                        userId ? <Profile/> : <Navigate to="/auth" />
+                        userId !== '' ? <Profile/> : <Navigate to="/auth" />
                     }/>
                     <Route path="/auth" element={
-                        userId ? <Navigate to="/" /> : <Auth/>
+                        userId !== '' ? <Navigate to="/" /> : <Auth/>
                     }/>
                 </Routes>
             </ThemeProvider>
         </Container>
     );
+
 }
 
 export default App;
