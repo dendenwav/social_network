@@ -1,8 +1,12 @@
 import AuthenticatedPagesContainer from '../../components/AuthenticatedPage/AuthenticatedPage';
 
-const Home = () => {
+interface IHomeProps {
+    userId: string;
+}
+
+const Home = ({userId}: IHomeProps) => {
     return (
-        <AuthenticatedPagesContainer>
+        <AuthenticatedPagesContainer userId={userId}>
             <div className='testscss'>Home</div>
         </AuthenticatedPagesContainer>
     )

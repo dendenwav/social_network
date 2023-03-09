@@ -7,6 +7,7 @@ import { SnackbarProvider } from 'notistack';
 import { SnackbarCloseButton } from './components/Toast/SnackbarCloseButton';
 import rootReducer from './reducers/index';
 import App from './App';
+import './styles/main.scss';
 
 export const store = configureStore({
     reducer: rootReducer,

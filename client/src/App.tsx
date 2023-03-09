@@ -33,15 +33,11 @@ function App() {
         },
     });
 
-    if (userId === null) {
+    if (userId === null || userId === undefined) {
         return (
             <Container component="main" maxWidth="lg" className='main'>
                 <ThemeProvider theme={theme}>
-                    <Routes>
-                        <Route path="/" element={<Loading IsAuthenticated/>}/>
-                        <Route path="/profile" element={<Loading/>}/>
-                        <Route path="/auth" element={<Loading/>}/>
-                    </Routes>
+                    <Loading/>
                 </ThemeProvider>
             </Container>
         );
@@ -52,10 +48,10 @@ function App() {
             <ThemeProvider theme={theme}>
                 <Routes>
                     <Route path="/" element={
-                        userId !== '' ? <Home/> : <Navigate to="/auth" />
+                        userId !== '' ? <Home userId={userId}/> : <Navigate to="/auth" />
                     }/>
-                    <Route path="/profile" element={
-                        userId !== '' ? <Profile/> : <Navigate to="/auth" />
+                    <Route path="/profile/:id" element={
+                        userId !== '' ? <Profile userId={userId}/> : <Navigate to="/auth" />
                     }/>
                     <Route path="/auth" element={
                         userId !== '' ? <Navigate to="/" /> : <Auth/>
@@ -64,7 +60,6 @@ function App() {
             </ThemeProvider>
         </Container>
     );
-
 }
 
 export default App;

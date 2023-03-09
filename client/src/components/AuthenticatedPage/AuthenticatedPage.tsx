@@ -2,13 +2,23 @@ import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
 import Topbar from "../Topbar/Topbar";
 
 type AuthenticatedPagesContainerProps = {
-    children: ReactJSXElement
+    children: ReactJSXElement,
+    userId?: string
 }
 
-const AuthenticatedPage = ({ children }: AuthenticatedPagesContainerProps) => {
+const AuthenticatedPage = ({ children, userId }: AuthenticatedPagesContainerProps) => {
+    if (!userId) {
+        return (
+            <>
+                <Topbar/>
+                {children}
+            </>
+        )
+    }
+
     return (
         <>
-            <Topbar/>
+            <Topbar userId={userId}/>
             {children}
         </>
     )

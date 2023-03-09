@@ -1,14 +1,14 @@
-import { CircularProgress, Grid } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 
-const Loading = () => {
+const Error = () => {
     
     return (
         <Grid container justifyContent="center" alignContent="center" className='loading-container'>
             <Grid item>
-                <CircularProgress color="secondary"/>
+                <Typography variant='h1'>Error 404</Typography>
             </Grid>
         </Grid>   
     )
 };
 
-export default Loading;
+export default Error;
