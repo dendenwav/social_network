@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { SnackbarProvider } from 'notistack';
 
-import { SnackbarCloseButton } from './components/toast/SnackbarCloseButton';
+import { SnackbarCloseButton } from './components/Toast/SnackbarCloseButton';
 import rootReducer from './reducers/index';
 import App from './App';
 

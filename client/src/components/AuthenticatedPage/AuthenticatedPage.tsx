@@ -1,18 +1,17 @@
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
-import Topbar from "../../../components/topbar/Topbar";
+import Topbar from "../Topbar/Topbar";
 
 type AuthenticatedPagesContainerProps = {
     children: ReactJSXElement
 }
 
-const AuthenticatedPagesContainer = ({ children }: AuthenticatedPagesContainerProps) => {
+const AuthenticatedPage = ({ children }: AuthenticatedPagesContainerProps) => {
     return (
         <>
             <Topbar/>
             {children}
-
         </>
     )
 };
 
-export default AuthenticatedPagesContainer;
+export default AuthenticatedPage;

@@ -1,4 +1,4 @@
-import AuthenticatedPagesContainer from '../_containers/AuthenticatedPages/AuthenticatedPagesContainer';
+import AuthenticatedPagesContainer from '../../components/AuthenticatedPage/AuthenticatedPage';
 
 const Home = () => {
     return (

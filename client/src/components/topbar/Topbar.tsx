@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { LogoutUser } from '../../actions/authActions';
 import { useAppDispatch } from '../../hooks';
-import ConfirmDialog from '../custom_dialog/ConfirmDialog';
+import ConfirmDialog from '../Dialog/ConfirmDialog';
 
 // const Search = styled('div')(({ theme }) => ({
 //     position: 'relative',

@@ -37,7 +37,11 @@ function App() {
         return (
             <Container component="main" maxWidth="lg" className='main'>
                 <ThemeProvider theme={theme}>
-                    <Loading/>
+                    <Routes>
+                        <Route path="/" element={<Loading IsAuthenticated/>}/>
+                        <Route path="/profile" element={<Loading/>}/>
+                        <Route path="/auth" element={<Loading/>}/>
+                    </Routes>
                 </ThemeProvider>
             </Container>
         );

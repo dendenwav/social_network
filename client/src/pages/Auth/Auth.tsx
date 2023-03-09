@@ -6,7 +6,7 @@ import PasswordStrengthBar from 'react-password-strength-bar';
 import { useSnackbar } from 'notistack';
 
 import { LoginUser, RegisterUser } from '../../actions/authActions';
-import Input from '../../components/input/Input';
+import Input from '../../components/Input/Input';
 import { useAppDispatch } from '../../hooks';
 
 const initialStateLogin = { userId: '', password: '' };
