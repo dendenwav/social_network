@@ -1,8 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { Paper } from '@mui/material';
 
 import AuthenticatedPagesContainer from '../../components/AuthenticatedPage/AuthenticatedPage';
+import { getUser } from "../../actions/usersActions";
+import Error from "../Error/Error";
+import { USER_NOT_FOUND } from "../../constants/errorMessages";
 
 interface IProfileProps {
     userId: string;
@@ -10,11 +13,29 @@ interface IProfileProps {
 
 const Profile = ({userId}: IProfileProps, ) => {
     const { id } = useParams<{ id: string }>();
+    const [userExists, setUserExists] = useState<boolean>(true);
+    const [errorMessage, setErrorMessage] = useState<string>('THERE WAS AN ERROR');
     
     useEffect(() => {
-        console.log(id); // Todo check if this userId exists
-    }, [id])
-    
+        let result;
+        async function GetUserFunc(id: string | undefined) {
+            if (id !== userId && id !== undefined) {
+                result = await getUser(id);
+                console.log(result);
+                if (result === USER_NOT_FOUND) {
+                    setUserExists(false);
+                    setErrorMessage(USER_NOT_FOUND);
+                }
+            }
+        }
+        GetUserFunc(id);
+    }, [id, userId])
+
+    if (!userExists) {
+        return (
+            <Error errorMessage={errorMessage}/>
+        );
+    }    
 
     return (
         <AuthenticatedPagesContainer userId={userId}>
