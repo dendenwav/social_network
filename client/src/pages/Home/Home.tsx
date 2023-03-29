@@ -7,7 +7,7 @@ interface IHomeProps {
 const Home = ({userId}: IHomeProps) => {
     return (
         <AuthenticatedPagesContainer userId={userId}>
-            <div className='testscss'>Home</div>
+            <div className='testscss'>HomeModified</div>
         </AuthenticatedPagesContainer>
     )
 };
