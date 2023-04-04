@@ -8,6 +8,8 @@ const auth = (req, res, next) => {
     if (!req.cookies || !req.cookies.Authorization) {
         return res.status(401).json({ message: 'Une erreur est survenue lors de la vérification de connexion. Veuillez vous reconnecter.' });
     }
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    console.log(ip);
     const token = req.cookies.Authorization;
     try {
         const decodedToken = jsonwebtoken_1.default.verify(token.split(' ')[1], process.env.JWT_SECRET);

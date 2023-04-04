@@ -10,6 +10,8 @@ import Auth from "./pages/Auth/Auth";
 import Home from "./pages/Home/Home";
 import Profile from "./pages/Profile/Profile";
 import Loading from "./pages/Loading/Loading";
+import Error from "./pages/Error/Error";
+import { PAGE_NOT_FOUND } from "./constants/errorMessages";
 
 function App() {
     const dispatch = useAppDispatch();
@@ -55,6 +57,9 @@ function App() {
                     }/>
                     <Route path="/auth" element={
                         userId !== '' ? <Navigate to="/" /> : <Auth/>
+                    }/>
+                    <Route path="/404" element={
+                        userId !== '' ? <Error errorMessage={PAGE_NOT_FOUND}/> : <Navigate to="/auth" />
                     }/>
                 </Routes>
             </ThemeProvider>

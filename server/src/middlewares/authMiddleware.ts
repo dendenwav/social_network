@@ -5,6 +5,8 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
     if (!req.cookies || !req.cookies.Authorization) {
         return res.status(401).json({ message: 'Une erreur est survenue lors de la vérification de connexion. Veuillez vous reconnecter.' });
     }
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress ;
+    console.log(ip);
     
     const token = req.cookies.Authorization;
 
