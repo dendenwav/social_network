@@ -8,7 +8,7 @@ export interface IRegisterUser {
 }
 
 export interface IUser {
-    userId: string;
+    pseudo: string;
     username?: string;
     email?: string;
     password?: string;

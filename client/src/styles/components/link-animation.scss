@@ -1,38 +1,51 @@
 a.underline {
-    --line: var(--black);
-    --color: var(--black);
     text-decoration: none;
-    color: var(--color);
+    color: var(--black);
     position: relative;
-    span {
-        background-image: linear-gradient(0deg, var(--line) 0%, var(--line) 100%);
-        background-position: 100% 100%;
-        background-repeat: no-repeat;
-        background-size: var(--background-size, 100%) 1px;
-        transition: background-size .2s linear var(--background-delay, .15s);
-        line-height: 20px;
-        transform: translateZ(0);
+    display: inline-block;
+    div {
+        position: relative;
+        width: min-content;
+        white-space: nowrap;
+        height: 1.5rem;
+        font-size: 1.25rem;
+        span {
+            position: absolute;
+            border-bottom: 1px solid var(--black);
+            width: 100%;
+            bottom: 0;
+            left: 0;
+            transform-origin: 100% 0;
+            transform: scaleX(1);
+            transition: transform .2s linear var(--background-delay, .15s);
+        }
     }
     svg {
+        position: absolute;
         vertical-align: top;
         display: inline;
-        line-height: 1;
-        left: -5px;
-        fill: none;
+        height: 1.5rem;
+        stroke-width: 1px;
+        right: -16px;
+        bottom: -1px;
         stroke-linecap: round;
         stroke-linejoin: round;
-        stroke-width: 1px;
-        stroke: var(--line);
-        stroke-dasharray: 7.95 25;
-        stroke-dashoffset: var(--stroke-dashoffset, 46);
+        stroke: var(--black);
+        stroke-dasharray: 16 41;
+        stroke-dashoffset: var(--stroke-dashoffset, 16);
         transition: stroke-dashoffset var(--stroke-duration, .15s) var(--stroke-easing, linear) var(--stroke-delay, 0s);
+        polyline {            
+            vector-effect: non-scaling-stroke;
+        }
     }
     &:hover {
-        --background-size: 0%;
         --background-delay: 0s;
-        --stroke-dashoffset: 26;
+        --stroke-dashoffset: -18.5;
         --stroke-duration: .3s;
         --stroke-easing: cubic-bezier(.3, 1.5, .5, 1);
-        --stroke-delay: .195s;
+        --stroke-delay: .2s;
+        div span {
+            transform: scaleX(0);
+        }
     }
 }

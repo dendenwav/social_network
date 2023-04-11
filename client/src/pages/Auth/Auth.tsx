@@ -9,7 +9,7 @@ import { LoginUser, RegisterUser } from '../../actions/authActions';
 import Input from '../../components/Input/Input';
 import { useAppDispatch } from '../../hooks';
 
-const initialStateLogin = { userId: '', password: '' };
+const initialStateLogin = { pseudo: '', password: '' };
 const initialStateRegister = { pseudo: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '' };
 
 const LoginOverlayHeader = 'Bonjour !';
