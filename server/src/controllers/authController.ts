@@ -3,11 +3,12 @@ import jwt from "jsonwebtoken";
 import bcrypt from 'bcrypt';
 
 import UserModel from '../models/UserModel';
+import { ILoginUser, IRegisterUser } from '../models/_interfaces/UsersInterfaces';
 
 //REGISTER
 export const registerUser = async (req: Request, res: Response) => {
     console.log(req.body);
-    const { pseudo, email, password, confirmPassword, firstName, lastName } = req.body;
+    const { pseudo, email, password, confirmPassword, firstName, lastName }: IRegisterUser = req.body;
 
     // Input validation
     if (!pseudo || !email || !password || !confirmPassword || !firstName || !lastName) {
@@ -70,7 +71,7 @@ export const registerUser = async (req: Request, res: Response) => {
 //LOGIN
 export const loginUser = async (req: Request, res: Response) => {
     console.log(req.body);
-    const { userId, password } = req.body;
+    const { userId, password }: ILoginUser = req.body;
 
     try {
         if (!userId || !password) {

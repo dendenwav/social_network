@@ -5,10 +5,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from '@mui/icons-material/Clear';
 
 import { getUsers } from "../../actions/usersActions";
-import * as apiInterfaces from "../../api/_interfaces";
+import * as UsersInterfaces from "../../../../server/src/models/_interfaces/UsersInterfaces";
 
 export default function SearchBar() {    
-    const [users, setUsers] = useState<apiInterfaces.IUser[]>([]);
+    const [users, setUsers] = useState<UsersInterfaces.IUser[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [showClear, setShowClear] = useState(false);
     const navigate = useNavigate();
@@ -17,8 +17,8 @@ export default function SearchBar() {
         let result;
         async function GetUsersFunc() {
             result = await getUsers();
-            result.forEach((user: apiInterfaces.IUser) => {
-                if (!users.some((u: apiInterfaces.IUser) => u.pseudo === user.pseudo)) setUsers((users) => [...users, { pseudo: user.pseudo }]);
+            result.forEach((user: UsersInterfaces.IUser) => {
+                if (!users.some((u: UsersInterfaces.IUser) => u.pseudo === user.pseudo)) setUsers((users) => [...users, { pseudo: user.pseudo }]);
             });
         }
         GetUsersFunc();
@@ -49,7 +49,7 @@ export default function SearchBar() {
     }
 
     const tryResearch = (userToResearch: string) => {
-        if (userToResearch.length > 0 && users.some((user: apiInterfaces.IUser) => user.pseudo === userToResearch)) navigate(`/profile/${userToResearch}`);
+        if (userToResearch.length > 0 && users.some((user: UsersInterfaces.IUser) => user.pseudo === userToResearch)) navigate(`/profile/${userToResearch}`);
         else console.log("no user found");
     }
     

@@ -3,13 +3,13 @@ import { Dispatch } from 'react';
 import { SnackbarMessage, OptionsObject, SnackbarKey } from 'notistack';
 
 import { AUTH, LOGOUT } from '../constants/actionTypes';
-import * as InterfacesApi from '../api/_interfaces';
+import { IRegisterUser, ILoginUser } from '../../../server/src/models/_interfaces/UsersInterfaces';
 import * as Interfaces from './_interfaces';
 import * as Api from '../api/api';
 
 
 export const RegisterUser = async (
-        newUser: InterfacesApi.IRegisterUser,
+        newUser: IRegisterUser,
         dispatch?: Dispatch<Interfaces.IAuthAction>,
         enqueueSnackbar?: (message: SnackbarMessage, options?: OptionsObject | undefined) => SnackbarKey
     ) => {
@@ -25,7 +25,7 @@ export const RegisterUser = async (
 };
 
 export const LoginUser = async (
-        existingUser: InterfacesApi.IUser,
+        existingUser: ILoginUser,
         dispatch?: Dispatch<Interfaces.IAuthAction>,
         enqueueSnackbar?: (message: SnackbarMessage, options?: OptionsObject | undefined) => SnackbarKey
     ) => {
