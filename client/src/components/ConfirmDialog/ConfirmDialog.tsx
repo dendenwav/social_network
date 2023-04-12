@@ -37,8 +37,8 @@ const ConfirmDialog = (props: ConfirmDialogProps) => {
                 <DialogContentText>{children}</DialogContentText>
             </DialogContent>
             <DialogActions>
+                <Button autoFocus onClick={OnDenyButtonClick} color="secondary" variant="outlined">Non</Button>
                 <Button onClick={OnAffirmButtonClick} color="secondary" variant='contained'>Oui</Button>
-                <Button onClick={OnDenyButtonClick} color="secondary" variant="outlined">Non</Button>
             </DialogActions>
         </Dialog>
     );

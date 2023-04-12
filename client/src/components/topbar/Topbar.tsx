@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { LogoutUser } from '../../actions/authActions';
 import { useAppDispatch } from '../../hooks';
-import ConfirmDialog from '../Dialog/ConfirmDialog';
+import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
 import SearchBar from '../Searchbar/Searchbar';
 
 interface ITopbarProps {
