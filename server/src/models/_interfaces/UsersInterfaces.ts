@@ -19,6 +19,7 @@ export interface IUser {
     password?: string;
     profilePicture?: string;
     coverPicture?: string;
+    importedPics?: string[];
     followers?: string[];
     followings?: string[];
     isAdmin?: boolean;

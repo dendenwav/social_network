@@ -33,6 +33,10 @@ const UserSchema = new mongoose.Schema(
         type: String,
         default: "",
     },
+    importedPics: {
+        type: [String],
+        default: [],
+    },
     followers: {
         type: [String],
         default: [],

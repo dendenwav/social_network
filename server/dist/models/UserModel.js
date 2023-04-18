@@ -36,6 +36,10 @@ const UserSchema = new mongoose_1.default.Schema({ pseudo: {
         type: String,
         default: "",
     },
+    importedPics: {
+        type: [String],
+        default: [],
+    },
     followers: {
         type: [String],
         default: [],
