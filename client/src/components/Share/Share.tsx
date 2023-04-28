@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Box, Button, Dialog, DialogContent, DialogTitle, IconButton, Slide } from "@mui/material";
-import { ArrowBack, ArrowForward, Close, Check, Crop, Delete } from '@mui/icons-material';
+import { ArrowBack, ArrowForward, Close, Check, Crop, Mode } from '@mui/icons-material';
 import { useSnackbar } from "notistack";
 
 import ImageResizer from "../ImageResizer/ImageResizer";
@@ -39,10 +39,6 @@ const Share = (props: DialogProps) => {
 
     const handleSwipe = () => {
         setChecked((prev) => !prev);
-    };
-
-    const handleDeletePicture = (e: React.InputHTMLAttributes<HTMLInputElement>) => {
-        setPicture(null);
     };
 
     const handleClose = async () => {
@@ -132,10 +128,18 @@ const Share = (props: DialogProps) => {
                             <Button fullWidth variant="outlined" component="label" color="secondary" size="large" onClick={handleClickOpen} startIcon={<Crop/>}>
                                 Redimensionner l'image
                             </Button>
-                            <Button fullWidth variant="outlined" component="label" color="secondary" size="large" onClick={handleDeletePicture} startIcon={<Delete/>}>
-                                Supprimer l'image
-                            </Button>
-                            <ImageResizer open={openImageResizer} onClose={handleCloseImageResizer} image={picture} imageHeight={pictureHeight} imageWidth={pictureWidth}/>
+                            <Button fullWidth variant="outlined" component="label" color="secondary" size="large" startIcon={<Mode/>}>
+                                Modifier l'image                                
+                                <input 
+                                    type="file" 
+                                    hidden
+                                    accept="image/*"
+                                    onChange={handleFileInput}
+                                />
+                            </Button>                            
+                            {pictureWidth !== 0 && pictureHeight !== 0 && picture !== null? (
+                                <ImageResizer open={openImageResizer} onClose={handleCloseImageResizer} image={picture} imageHeight={pictureHeight} imageWidth={pictureWidth}/>
+                            ) : null}
                         </div>
                     </div>
                 )
