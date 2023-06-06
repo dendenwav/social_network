@@ -1,5 +1,5 @@
-import { Crop, Mode } from "@mui/icons-material";
-import { Button } from "@mui/material";
+import { Crop, Mode, SaveAlt } from "@mui/icons-material";
+import { Box, Button } from "@mui/material";
 import ImageResizer from "../ImageResizer/ImageResizer";
 import { useCallback, useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
@@ -19,17 +19,17 @@ interface FirstPageContentProps {
 };
 
 const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}: FirstPageContentProps) => {
-    const defaultResizeableEle: ResizeableEle = {top: 0, left: 0, width: 0, height: 0};
     const { enqueueSnackbar } = useSnackbar();
+    const defaultResizeableEle: ResizeableEle = {top: 0, left: 0, width: 0, height: 0};
 
     const [openImageResizer, setOpenImageResizer] = useState(false);
     const [pictureWidth, setPictureWidth] = useState(0);
     const [pictureHeight, setPictureHeight] = useState(0);
-    const [imageHeightToRender, setImageHeightToRender] = useState(window.innerHeight - 64);
-    const [imageWidthToRender, setImageWidthToRender] = useState(600);
+    const [imageResizerHeight, setImageResizerHeight] = useState(window.innerHeight - 64);
+    const [imageResizerWidth, setImageResizerWidth] = useState(600);
     const [resizeableEle, setResizeableEle] = useState<ResizeableEle>(defaultResizeableEle);
 
-    const setImageRenderValues = useCallback((initialHeight: number, initialWidth: number) => {
+    const setImageResizerValues = useCallback((initialHeight: number, initialWidth: number) => {
         setIsImageLoaded(false);
         const imageRatio = initialWidth / initialHeight;
         const maxImageRatio = 600 / (window.innerHeight - 128);
@@ -40,13 +40,13 @@ const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}
         if (imageRatio < maxImageRatio) {
             width = (window.innerHeight - 128) * imageRatio;
             height = window.innerHeight - 128;
-            setImageWidthToRender(width);
-            setImageHeightToRender(height);
+            setImageResizerWidth(width);
+            setImageResizerHeight(height);
         } else {
             width = 600;
             height = 600 / imageRatio;
-            setImageWidthToRender(width);
-            setImageHeightToRender(height);
+            setImageResizerWidth(width);
+            setImageResizerHeight(height);
         }
 
         if (imageRatio > 1) {
@@ -70,9 +70,15 @@ const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}
     useEffect(() => {
         if (pictureHeight > 0 && pictureWidth > 0) {
             console.log("set image render values");
-            setImageRenderValues(pictureHeight, pictureWidth);
+            setImageResizerValues(pictureHeight, pictureWidth);
         }
-    }, [pictureHeight, pictureWidth, setImageRenderValues]);
+    }, [pictureHeight, pictureWidth, setImageResizerValues]);
+
+    useEffect(() => {
+        if (resizeableEle !== defaultResizeableEle) {
+            console.log("resizeableEle changed");
+        }
+    }, [resizeableEle]);
     
     const handleFileInput = (e: any) => {
         var i = new Image();
@@ -112,56 +118,71 @@ const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}
 
     return (        
         <div>
-            <Button variant="outlined" component="label" color="secondary">
-                Upload File
-                <input 
-                    type="file" 
-                    hidden
-                    accept="image/*"
-                    onChange={handleFileInput}
-                />
-            </Button>
-            {
-                picture !== null ? (
-                    <div className="image-container">
-                        <img src={picture} alt="preview" className="uploaded-image"/>
-                        <div className="image-overlay" >
-                            <Button fullWidth variant="outlined" component="label" color="secondary" size="large" onClick={handleOpen} startIcon={<Crop/>}>
-                                Redimensionner l'image
-                            </Button>
-                            <Button fullWidth variant="outlined" component="label" color="secondary" size="large" startIcon={<Mode/>}>
-                                Changer l'image                                
-                                <input 
-                                    type="file" 
-                                    hidden
-                                    accept="image/*"
-                                    onChange={handleFileInput}
-                                />
-                            </Button>                            
-                            {isImageLoaded && resizeableEle !== defaultResizeableEle && (
-                                <ImageResizer 
+        {
+            picture !== null && isImageLoaded ? (
+                <div className="image-container full">
+                    <div className="image-full-content">
+                        <div className="image-info">
+                            <p>image infos</p>
+                        </div>
+                        <div
+                            className="image-overview" 
+                            style={{
+                                background: `url(${picture})`,
+                                backgroundSize: '514px auto'
+                            }}
+                        >
+                            <div className="image-overlay" >
+                                <Button fullWidth variant="outlined" component="label" color="secondary" size="large" onClick={handleOpen} startIcon={<Crop/>}>
+                                    Redimensionner l'image
+                                </Button>
+                                <Button fullWidth variant="outlined" component="label" color="secondary" size="large" startIcon={<Mode/>}>
+                                    Changer l'image                                
+                                    <input 
+                                        type="file" 
+                                        hidden
+                                        accept="image/*"
+                                        onChange={handleFileInput}
+                                        />
+                                </Button>                            
+                                {isImageLoaded && resizeableEle !== defaultResizeableEle && (
+                                    <ImageResizer 
                                     open={openImageResizer} 
                                     onClose={handleClose} 
                                     image={picture} 
-                                    imageHeightToRender={imageHeightToRender} 
-                                    imageWidthToRender={imageWidthToRender} 
+                                    imageResizerHeight={imageResizerHeight} 
+                                    imageResizerWidth={imageResizerWidth} 
                                     defaultResizeableEle={resizeableEle}
-                                />
-                            )}
+                                    />
+                                )}
+                            </div>
                         </div>
                     </div>
-                )
-                : (
-                    <div className="image-container empty">
-
+                </div>
+            )
+            : (
+                <div className="image-container empty">
+                    <div className="image-empty-content">
+                        <div className="image-empty-header">
+                            <div className="image-empty-icon">
+                                <SaveAlt/>
+                            </div>
+                            <div className="image-empty-title">Glisser déposer une image ici</div>
+                            <div className="image-empty-subtitle">ou</div>
+                        </div>
+                        <Button variant="outlined" component="label" color="secondary">
+                            PARCOURIR LES FICHIERS
+                            <input 
+                                type="file" 
+                                hidden
+                                accept="image/*"
+                                onChange={handleFileInput}
+                            />
+                        </Button>
                     </div>
-                )
-            }
-            <p>Contenu du post</p>
-            <p>Contenu du post</p>
-            <p>Contenu du post</p>
-            <p>Contenu du post</p>
-            <p>Contenu du post </p>
+                </div>
+            )
+        }
         </div>
     )
 }

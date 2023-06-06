@@ -1,22 +1,23 @@
-import { Check, Close } from "@mui/icons-material";
-import { Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
 import { useState } from "react";
 import { DraggableData, ResizableDelta, Rnd, RndResizeCallback } from "react-rnd";
 import { ResizeDirection } from "re-resizable";
 import { Position } from "react-rnd";
 import { DraggableEventHandler, DraggableEvent } from "react-draggable";
+import { Check, Close } from "@mui/icons-material";
+import { Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
+
 import { ResizeableEle } from "../Share/FirstPageContent";
 
 interface ImageResizerProps {
     open: boolean;
     onClose: (imageToRender?: ResizeableEle) => void;
     image: string;
-    imageHeightToRender: number;
-    imageWidthToRender: number;
+    imageResizerHeight: number;
+    imageResizerWidth: number;
     defaultResizeableEle: ResizeableEle;
 };
 
-const ImageResizer = ({ onClose, open, image, imageHeightToRender, imageWidthToRender, defaultResizeableEle }: ImageResizerProps) => {
+const ImageResizer = ({ onClose, open, image, imageResizerHeight, imageResizerWidth, defaultResizeableEle }: ImageResizerProps) => {
     const [resizeableEle, setResizeableEle] = useState<ResizeableEle>(defaultResizeableEle);
 
     const handleClose = () => {
@@ -46,7 +47,7 @@ const ImageResizer = ({ onClose, open, image, imageHeightToRender, imageWidthToR
     };
 
     return (
-        <Dialog onClose={handleClose} open={open} maxWidth='sm' sx={[{'& .MuiDialog-paper': { height: `${imageHeightToRender + 64}px`, width: `${imageWidthToRender}px` }}]}>
+        <Dialog onClose={handleClose} open={open} maxWidth='sm' sx={[{'& .MuiDialog-paper': { height: `${imageResizerHeight + 64}px`, width: `${imageResizerWidth}px` }}]}>
             <DialogTitle align='center'>
                 Redimensionner l'image
                 <IconButton onClick={handleClose} sx={{position: 'absolute', left: 12, top: '12px'}}>
@@ -58,9 +59,9 @@ const ImageResizer = ({ onClose, open, image, imageHeightToRender, imageWidthToR
             </DialogTitle>
             <DialogContent sx={{
                 background: `url(${image})`,
-                backgroundSize: `${imageWidthToRender}px ${imageHeightToRender}px`, 
-                height: `${imageHeightToRender}px`, 
-                width: `${imageWidthToRender}px`,
+                backgroundSize: `${imageResizerWidth}px ${imageResizerHeight}px`, 
+                height: `${imageResizerHeight}px`, 
+                width: `${imageResizerWidth}px`,
                 overflow: 'hidden',
                 position: 'relative'
             }}>
