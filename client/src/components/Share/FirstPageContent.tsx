@@ -1,7 +1,7 @@
 import { Crop, Mode } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import ImageResizer from "../ImageResizer/ImageResizer";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 
 export interface ResizeableEle {
@@ -29,18 +29,50 @@ const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}
     const [imageWidthToRender, setImageWidthToRender] = useState(600);
     const [resizeableEle, setResizeableEle] = useState<ResizeableEle>(defaultResizeableEle);
 
+    const setImageRenderValues = useCallback((initialHeight: number, initialWidth: number) => {
+        setIsImageLoaded(false);
+        const imageRatio = initialWidth / initialHeight;
+        const maxImageRatio = 600 / (window.innerHeight - 128);
+
+        let width = 0;
+        let height = 0;
+
+        if (imageRatio < maxImageRatio) {
+            width = (window.innerHeight - 128) * imageRatio;
+            height = window.innerHeight - 128;
+            setImageWidthToRender(width);
+            setImageHeightToRender(height);
+        } else {
+            width = 600;
+            height = 600 / imageRatio;
+            setImageWidthToRender(width);
+            setImageHeightToRender(height);
+        }
+
+        if (imageRatio > 1) {
+            setResizeableEle({
+                top: 0, 
+                left: (width - height) / 2, 
+                width: height, 
+                height: height
+            });
+        } else {
+            setResizeableEle({
+                top: (height - width) / 2,
+                left: 0,
+                width: width,
+                height: width
+            });
+        }
+        setIsImageLoaded(true);
+    }, [setIsImageLoaded]);
+    
     useEffect(() => {
         if (pictureHeight > 0 && pictureWidth > 0) {
             console.log("set image render values");
             setImageRenderValues(pictureHeight, pictureWidth);
         }
-    }, [pictureHeight, pictureWidth]);
-
-    useEffect(() => {
-        if (resizeableEle !== defaultResizeableEle) {
-            console.log("resizeableEle changed");
-        }
-    }, [resizeableEle]);
+    }, [pictureHeight, pictureWidth, setImageRenderValues]);
     
     const handleFileInput = (e: any) => {
         var i = new Image();
@@ -78,44 +110,6 @@ const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}
         setOpenImageResizer(false);
     };
 
-    const setImageRenderValues = (initialHeight: number, initialWidth: number) => {
-        setIsImageLoaded(false);
-        const imageRatio = initialWidth / initialHeight;
-        const maxImageRatio = 600 / (window.innerHeight - 128);
-
-        let width = 0;
-        let height = 0;
-
-        if (imageRatio < maxImageRatio) {
-            width = (window.innerHeight - 128) * imageRatio;
-            height = window.innerHeight - 128;
-            setImageWidthToRender(width);
-            setImageHeightToRender(height);
-        } else {
-            width = 600;
-            height = 600 / imageRatio;
-            setImageWidthToRender(width);
-            setImageHeightToRender(height);
-        }
-
-        if (imageRatio > 1) {
-            setResizeableEle({
-                top: 0, 
-                left: (width - height) / 2, 
-                width: height, 
-                height: height
-            });
-        } else {
-            setResizeableEle({
-                top: (height - width) / 2,
-                left: 0,
-                width: width,
-                height: width
-            });
-        }
-        setIsImageLoaded(true);
-    };
-
     return (        
         <div>
             <Button variant="outlined" component="label" color="secondary">
@@ -144,7 +138,7 @@ const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}
                                     onChange={handleFileInput}
                                 />
                             </Button>                            
-                            {isImageLoaded && resizeableEle != defaultResizeableEle && (
+                            {isImageLoaded && resizeableEle !== defaultResizeableEle && (
                                 <ImageResizer 
                                     open={openImageResizer} 
                                     onClose={handleClose} 
