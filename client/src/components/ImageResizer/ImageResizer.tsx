@@ -1,54 +1,48 @@
 import { Check, Close } from "@mui/icons-material";
 import { Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
-import { useEffect, useState } from "react";
-import { Rnd } from "react-rnd";
+import { useState } from "react";
+import { DraggableData, ResizableDelta, Rnd, RndResizeCallback } from "react-rnd";
+import { ResizeDirection } from "re-resizable";
+import { Position } from "react-rnd";
+import { DraggableEventHandler, DraggableEvent } from "react-draggable";
+import { ResizeableEle } from "../Share/FirstPageContent";
 
 interface ImageResizerProps {
     open: boolean;
     onClose: (imageToRender?: ResizeableEle) => void;
     image: string;
-    imageHeight: number;
-    imageWidth: number;
+    imageHeightToRender: number;
+    imageWidthToRender: number;
+    defaultResizeableEle: ResizeableEle;
 };
 
-interface ResizeableEle {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-};
-
-const ImageResizer = (props: ImageResizerProps) => {
-    const { onClose, open, image, imageHeight, imageWidth } = props;
-    const [imageHeightToRender, setImageHeightToRender] = useState(window.innerHeight - 64);
-    const [imageWidthToRender, setImageWidthToRender] = useState(600);
-
-    const setImageRenderValues = (initialHeight: number, initialWidth: number) => {
-        const imageRatio = initialWidth / initialHeight;
-        const maxImageRatio = 600 / (window.innerHeight - 128);
-
-        let width = 0;
-        let height = 0;
-
-        if (imageRatio < maxImageRatio) {
-            width = (window.innerHeight - 128) * imageRatio;
-            height = window.innerHeight - 128;
-            setImageWidthToRender(width);
-            setImageHeightToRender(height);
-        } else {
-            width = 600;
-            height = 600 / imageRatio;
-            setImageWidthToRender(width);
-            setImageHeightToRender(height);
-        }
-    };
-
-    useEffect(() => {
-        setImageRenderValues(imageHeight, imageWidth);
-    }, [image, imageHeight, imageWidth]);
+const ImageResizer = ({ onClose, open, image, imageHeightToRender, imageWidthToRender, defaultResizeableEle }: ImageResizerProps) => {
+    const [resizeableEle, setResizeableEle] = useState<ResizeableEle>(defaultResizeableEle);
 
     const handleClose = () => {
-        onClose();
+        onClose(defaultResizeableEle);
+        setResizeableEle(defaultResizeableEle);
+    };
+    
+    const handleValidate = () => {
+        onClose(resizeableEle);
+    };
+
+    const handleResize: RndResizeCallback = (e: MouseEvent | TouchEvent, direction: ResizeDirection, ref: HTMLElement, delta: ResizableDelta, position: Position) => {
+        setResizeableEle({
+            top: position.y,
+            left: position.x,
+            width: ref.offsetWidth,
+            height: ref.offsetHeight
+        });
+    };
+
+    const handleDrag: DraggableEventHandler = (e: DraggableEvent, d: DraggableData) => {
+        setResizeableEle({
+            ...resizeableEle,
+            top: d.y,
+            left: d.x
+        });
     };
 
     return (
@@ -58,12 +52,12 @@ const ImageResizer = (props: ImageResizerProps) => {
                 <IconButton onClick={handleClose} sx={{position: 'absolute', left: 12, top: '12px'}}>
                     <Close />
                 </IconButton>
-                <IconButton onClick={handleClose} sx={{position: 'absolute', right: 12, top: '12px'}}>
+                <IconButton onClick={handleValidate} sx={{position: 'absolute', right: 12, top: '12px'}}>
                     <Check />
                 </IconButton>
             </DialogTitle>
             <DialogContent sx={{
-                backgroundImage: `url(${image})`, 
+                background: `url(${image})`,
                 backgroundSize: `${imageWidthToRender}px ${imageHeightToRender}px`, 
                 height: `${imageHeightToRender}px`, 
                 width: `${imageWidthToRender}px`,
@@ -75,26 +69,44 @@ const ImageResizer = (props: ImageResizerProps) => {
                     (
                         <Rnd
                             default={{
-                                x: 0,
-                                y: 0,
-                                width: 100,
-                                height: 100,
+                                x: resizeableEle.left,
+                                y: resizeableEle.top,
+                                width: resizeableEle.width,
+                                height: resizeableEle.height,
                             }}
-                            minWidth={20}
-                            minHeight={20}
+                            resizeHandleClasses={{
+                                bottom: 'resize-handle-bottom',
+                                left: 'resize-handle-left',
+                                right: 'resize-handle-right',
+                                top: 'resize-handle-top',
+                            }}
+                            disableDragging={false}
+                            enableResizing={{ 
+                                top:true, 
+                                right:true, 
+                                bottom:true, 
+                                left:true, 
+                                topRight:false, 
+                                bottomRight:false, 
+                                bottomLeft:false, 
+                                topLeft:false 
+                            }}
+                            onResize={handleResize}
+                            onDrag={handleDrag}
+                            minWidth={75}
+                            minHeight={75}
                             bounds="parent"
                             lockAspectRatio={1}
                         >
                             <div
                                 className="box"
-                                style={{ margin: 0, height: '100%', paddingBottom: '40px' }}
+                                style={{ margin: 0, height: '100%', paddingBottom: '40px', backgroundColor: 'rgba(255,255,255,0.3)' }}
                             >
-
                             </div>
+
                         </Rnd>
                     )
-                }
-                
+                }                
             </DialogContent>
         </Dialog>
     );

@@ -66,5 +66,45 @@
 }
 
 .box {
-    border: 2px solid red;
+    border: 3px solid var(--dark-grey);
+}
+
+.resize-handle-top,
+.resize-handle-bottom,
+.resize-handle-left,
+.resize-handle-right {
+    border-radius: 2px;
+    background-color: var(--light-grey);
+}
+
+.resize-handle-top,
+.resize-handle-bottom {
+    margin: 0 auto;
+    width: 30px !important;
+    height: 9px !important;
+    right: 0;
+}
+
+.resize-handle-left,
+.resize-handle-right {
+    margin: auto 0;
+    width: 9px !important;
+    height: 30px !important;
+    bottom: 0;
+}
+
+.resize-handle-left {
+    left: -3px !important;
+}
+
+.resize-handle-right {
+    right: -3px !important;
+}
+
+.resize-handle-top {
+    top: -3px !important;
+}
+
+.resize-handle-bottom {
+    bottom: -3px !important;
 }
