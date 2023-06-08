@@ -1,5 +1,5 @@
 import { Crop, Mode, SaveAlt } from "@mui/icons-material";
-import { Box, Button } from "@mui/material";
+import { Button } from "@mui/material";
 import ImageResizer from "../ImageResizer/ImageResizer";
 import { useCallback, useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
@@ -18,19 +18,20 @@ interface FirstPageContentProps {
     setPicture: React.Dispatch<React.SetStateAction<any>>;
 };
 
-const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}: FirstPageContentProps) => {
+const FirstPageContent = ({setIsImageLoaded, picture, setPicture}: FirstPageContentProps) => {
     const { enqueueSnackbar } = useSnackbar();
     const defaultResizeableEle: ResizeableEle = {top: 0, left: 0, width: 0, height: 0};
 
     const [openImageResizer, setOpenImageResizer] = useState(false);
-    const [pictureWidth, setPictureWidth] = useState(0);
-    const [pictureHeight, setPictureHeight] = useState(0);
+    const [imageHeight, setImageHeight] = useState(0);
+    const [imageWidth, setImageWidth] = useState(0);
+    const [resizeableEle, setResizeableEle] = useState<ResizeableEle>(defaultResizeableEle);
     const [imageResizerHeight, setImageResizerHeight] = useState(window.innerHeight - 64);
     const [imageResizerWidth, setImageResizerWidth] = useState(600);
-    const [resizeableEle, setResizeableEle] = useState<ResizeableEle>(defaultResizeableEle);
+    const [backgroundSize, setBackgroundSize] = useState('auto 518px');
+    const [backgroundPosition, setBackgroundPosition] = useState('0 0');
 
-    const setImageResizerValues = useCallback((initialHeight: number, initialWidth: number) => {
-        setIsImageLoaded(false);
+    const setImageResizerValues = (initialHeight: number, initialWidth: number): ResizeableEle => {
         const imageRatio = initialWidth / initialHeight;
         const maxImageRatio = 600 / (window.innerHeight - 128);
 
@@ -50,37 +51,72 @@ const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}
         }
 
         if (imageRatio > 1) {
-            setResizeableEle({
+            return {
                 top: 0, 
                 left: (width - height) / 2, 
                 width: height, 
                 height: height
-            });
+            };
         } else {
-            setResizeableEle({
+            return {
                 top: (height - width) / 2,
                 left: 0,
                 width: width,
                 height: width
-            });
+            };
         }
+    };
+
+    const setBackgroundSizeAndPosition = useCallback((newResizeableEle: ResizeableEle, initialHeight: number, initialWidth: number) => {
+        setImageHeight(initialHeight);
+        setImageWidth(initialWidth);
+
+        const maxSide = 518;
+        setIsImageLoaded(false);
+
+        const imageRatio = initialWidth / initialHeight;
+
+        let widthBackgound: String = 'auto';
+        let heightBackground: String = 'auto';
+
+        let topPosition: Number = 0;
+        let leftPosition: Number = 0;
+
+        if (imageRatio > 1) {
+            const heightResult = Math.round(imageResizerHeight * maxSide / newResizeableEle.height);
+            const backgroundRatio = heightResult / maxSide;
+
+            topPosition = Math.round((newResizeableEle.top * maxSide * backgroundRatio) / imageResizerHeight);
+            leftPosition = Math.round((newResizeableEle.left * maxSide * backgroundRatio * imageRatio) / imageResizerWidth);
+
+            heightBackground = `${heightResult}px`;
+        } else {
+            const widthResult = Math.round(imageResizerWidth * maxSide / newResizeableEle.width);
+            const backgroundRatio = widthResult / 518;
+
+            topPosition = Math.round((newResizeableEle.top * maxSide * backgroundRatio) / (imageResizerHeight * imageRatio));
+            leftPosition = Math.round((newResizeableEle.left * maxSide * backgroundRatio) / (imageResizerWidth));
+
+            widthBackgound = `${widthResult}px`;
+        }
+
+        setBackgroundSize(`${widthBackgound} ${heightBackground}`);
+        setBackgroundPosition(`${-leftPosition}px ${Math.round(-topPosition)}px`);
+        
         setIsImageLoaded(true);
-    }, [setIsImageLoaded]);
-    
-    useEffect(() => {
-        if (pictureHeight > 0 && pictureWidth > 0) {
-            console.log("set image render values");
-            setImageResizerValues(pictureHeight, pictureWidth);
-        }
-    }, [pictureHeight, pictureWidth, setImageResizerValues]);
+    }, [imageResizerHeight, imageResizerWidth, setIsImageLoaded]);
 
     useEffect(() => {
-        if (resizeableEle !== defaultResizeableEle) {
-            console.log("resizeableEle changed");
+        if (resizeableEle.width > 0 && resizeableEle.height > 0) {
+            setBackgroundSizeAndPosition(resizeableEle, imageHeight, imageWidth);
         }
-    }, [resizeableEle]);
+    }, [resizeableEle, imageHeight, imageWidth, setBackgroundSizeAndPosition]);
     
     const handleFileInput = (e: any) => {
+        if (resizeableEle !== defaultResizeableEle) {
+            setResizeableEle(defaultResizeableEle);
+        }
+
         var i = new Image();
         var reader = new FileReader();        
         reader.readAsDataURL(e.target.files[0]);
@@ -97,9 +133,15 @@ const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}
         };        
 
         i.onload = function () {
-            console.log(i.width, i.height);
-            setPictureHeight(i.height);
-            setPictureWidth(i.width);
+            setIsImageLoaded(false);
+
+            const result = setImageResizerValues(i.height, i.width);
+
+            setResizeableEle(result);
+            setImageHeight(i.height);
+            setImageWidth(i.width);
+
+            setIsImageLoaded(true);
         };
 
         e.target.value = null;
@@ -119,7 +161,7 @@ const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}
     return (        
         <div>
         {
-            picture !== null && isImageLoaded ? (
+            (picture !== null) ? (
                 <div className="image-container full">
                     <div className="image-full-content">
                         <div className="image-info">
@@ -128,8 +170,9 @@ const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}
                         <div
                             className="image-overview" 
                             style={{
-                                background: `url(${picture})`,
-                                backgroundSize: '514px auto'
+                                backgroundImage: `url(${picture})`,
+                                backgroundSize: backgroundSize,
+                                backgroundPosition: backgroundPosition,
                             }}
                         >
                             <div className="image-overlay" >
@@ -145,7 +188,7 @@ const FirstPageContent = ({isImageLoaded, setIsImageLoaded, picture, setPicture}
                                         onChange={handleFileInput}
                                         />
                                 </Button>                            
-                                {isImageLoaded && resizeableEle !== defaultResizeableEle && (
+                                {resizeableEle !== defaultResizeableEle && (
                                     <ImageResizer 
                                     open={openImageResizer} 
                                     onClose={handleClose} 

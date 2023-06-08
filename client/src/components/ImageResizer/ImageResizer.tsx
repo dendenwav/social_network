@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DraggableData, ResizableDelta, Rnd, RndResizeCallback } from "react-rnd";
 import { ResizeDirection } from "re-resizable";
 import { Position } from "react-rnd";
@@ -19,6 +19,10 @@ interface ImageResizerProps {
 
 const ImageResizer = ({ onClose, open, image, imageResizerHeight, imageResizerWidth, defaultResizeableEle }: ImageResizerProps) => {
     const [resizeableEle, setResizeableEle] = useState<ResizeableEle>(defaultResizeableEle);
+
+    useEffect(() => {
+        setResizeableEle(defaultResizeableEle);
+    }, [image, defaultResizeableEle]);
 
     const handleClose = () => {
         onClose(defaultResizeableEle);
@@ -58,7 +62,7 @@ const ImageResizer = ({ onClose, open, image, imageResizerHeight, imageResizerWi
                 </IconButton>
             </DialogTitle>
             <DialogContent sx={{
-                background: `url(${image})`,
+                backgroundImage: `url(${image})`,
                 backgroundSize: `${imageResizerWidth}px ${imageResizerHeight}px`, 
                 height: `${imageResizerHeight}px`, 
                 width: `${imageResizerWidth}px`,
