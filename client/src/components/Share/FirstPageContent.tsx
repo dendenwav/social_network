@@ -1,7 +1,7 @@
-import { Crop, Mode, SaveAlt } from "@mui/icons-material";
+import { PersonAdd, Tag, Crop, Mode, SaveAlt } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import ImageResizer from "../ImageResizer/ImageResizer";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 
 export interface ResizeableEle {
@@ -18,7 +18,7 @@ interface FirstPageContentProps {
     setPicture: React.Dispatch<React.SetStateAction<any>>;
 };
 
-const FirstPageContent = ({setIsImageLoaded, picture, setPicture}: FirstPageContentProps) => {
+const FirstPageContent = ({picture, setPicture}: FirstPageContentProps) => {
     const { enqueueSnackbar } = useSnackbar();
     const defaultResizeableEle: ResizeableEle = {top: 0, left: 0, width: 0, height: 0};
 
@@ -28,8 +28,14 @@ const FirstPageContent = ({setIsImageLoaded, picture, setPicture}: FirstPageCont
     const [resizeableEle, setResizeableEle] = useState<ResizeableEle>(defaultResizeableEle);
     const [imageResizerHeight, setImageResizerHeight] = useState(window.innerHeight - 64);
     const [imageResizerWidth, setImageResizerWidth] = useState(600);
-    const [backgroundSize, setBackgroundSize] = useState('auto 518px');
+    const [backgroundSize, setBackgroundSize] = useState('auto 550px');
     const [backgroundPosition, setBackgroundPosition] = useState('0 0');
+    
+    useEffect(() => {
+        if (resizeableEle.width > 0 && resizeableEle.height > 0) {
+            setBackgroundSizeAndPosition(resizeableEle, imageHeight, imageWidth, imageResizerHeight, imageResizerWidth);
+        }
+    }, [resizeableEle, imageHeight, imageWidth, imageResizerHeight, imageResizerWidth]);
 
     const setImageResizerValues = (initialHeight: number, initialWidth: number): ResizeableEle => {
         const imageRatio = initialWidth / initialHeight;
@@ -67,50 +73,40 @@ const FirstPageContent = ({setIsImageLoaded, picture, setPicture}: FirstPageCont
         }
     };
 
-    const setBackgroundSizeAndPosition = useCallback((newResizeableEle: ResizeableEle, initialHeight: number, initialWidth: number) => {
+    const setBackgroundSizeAndPosition = (newResizeableEle: ResizeableEle, initialHeight: number, initialWidth: number, resizerHeight: number, resizerWidth: number) => {
         setImageHeight(initialHeight);
         setImageWidth(initialWidth);
 
-        const maxSide = 518;
-        setIsImageLoaded(false);
-
+        const maxSide = 550;
         const imageRatio = initialWidth / initialHeight;
-
-        let widthBackgound: String = 'auto';
-        let heightBackground: String = 'auto';
-
+        
         let topPosition: Number = 0;
         let leftPosition: Number = 0;
 
+        let widthSize: String = 'auto';
+        let heightSize: String = 'auto';
+
         if (imageRatio > 1) {
-            const heightResult = Math.round(imageResizerHeight * maxSide / newResizeableEle.height);
+            const heightResult = resizerHeight * maxSide / newResizeableEle.height;
             const backgroundRatio = heightResult / maxSide;
 
-            topPosition = Math.round((newResizeableEle.top * maxSide * backgroundRatio) / imageResizerHeight);
-            leftPosition = Math.round((newResizeableEle.left * maxSide * backgroundRatio * imageRatio) / imageResizerWidth);
+            topPosition = (newResizeableEle.top * maxSide * backgroundRatio) / resizerHeight;
+            leftPosition = (newResizeableEle.left * maxSide * backgroundRatio * imageRatio) / resizerWidth;
 
-            heightBackground = `${heightResult}px`;
+            heightSize = `${heightResult}px`;
         } else {
-            const widthResult = Math.round(imageResizerWidth * maxSide / newResizeableEle.width);
-            const backgroundRatio = widthResult / 518;
+            const widthResult = resizerWidth * maxSide / newResizeableEle.width;
+            const backgroundRatio = widthResult / maxSide;
 
-            topPosition = Math.round((newResizeableEle.top * maxSide * backgroundRatio) / (imageResizerHeight * imageRatio));
-            leftPosition = Math.round((newResizeableEle.left * maxSide * backgroundRatio) / (imageResizerWidth));
+            topPosition = (newResizeableEle.top * maxSide * backgroundRatio) / (resizerHeight * imageRatio);
+            leftPosition = (newResizeableEle.left * maxSide * backgroundRatio) / (resizerWidth);
 
-            widthBackgound = `${widthResult}px`;
+            widthSize = `${widthResult}px`;
         }
 
-        setBackgroundSize(`${widthBackgound} ${heightBackground}`);
-        setBackgroundPosition(`${-leftPosition}px ${Math.round(-topPosition)}px`);
-        
-        setIsImageLoaded(true);
-    }, [imageResizerHeight, imageResizerWidth, setIsImageLoaded]);
-
-    useEffect(() => {
-        if (resizeableEle.width > 0 && resizeableEle.height > 0) {
-            setBackgroundSizeAndPosition(resizeableEle, imageHeight, imageWidth);
-        }
-    }, [resizeableEle, imageHeight, imageWidth, setBackgroundSizeAndPosition]);
+        setBackgroundPosition(`${-leftPosition}px ${-topPosition}px`);
+        setBackgroundSize(`${widthSize} ${heightSize}`);
+    };
     
     const handleFileInput = (e: any) => {
         if (resizeableEle !== defaultResizeableEle) {
@@ -133,15 +129,10 @@ const FirstPageContent = ({setIsImageLoaded, picture, setPicture}: FirstPageCont
         };        
 
         i.onload = function () {
-            setIsImageLoaded(false);
-
             const result = setImageResizerValues(i.height, i.width);
-
             setResizeableEle(result);
             setImageHeight(i.height);
             setImageWidth(i.width);
-
-            setIsImageLoaded(true);
         };
 
         e.target.value = null;
@@ -165,7 +156,24 @@ const FirstPageContent = ({setIsImageLoaded, picture, setPicture}: FirstPageCont
                 <div className="image-container full">
                     <div className="image-full-content">
                         <div className="image-info">
-                            <p>image infos</p>
+                            <div className="image-info-ats">
+                                <Button fullWidth variant="outlined" component="label" color="secondary" size="large" startIcon={<PersonAdd/>}>
+                                    Identifier un utilisateur
+                                </Button>
+
+                                <div className="image-info-ats-container">
+
+                                </div>
+                            </div>
+                            <div className="image-info-tags">
+                                <Button fullWidth variant="outlined" component="label" color="secondary" size="large" startIcon={<Tag/>}>
+                                    Ajouter un tag
+                                </Button>
+
+                                <div className="image-info-tags-container">
+
+                                </div>
+                            </div>
                         </div>
                         <div
                             className="image-overview" 
@@ -180,7 +188,7 @@ const FirstPageContent = ({setIsImageLoaded, picture, setPicture}: FirstPageCont
                                     Redimensionner l'image
                                 </Button>
                                 <Button fullWidth variant="outlined" component="label" color="secondary" size="large" startIcon={<Mode/>}>
-                                    Changer l'image                                
+                                    Remplacer l'image                                
                                     <input 
                                         type="file" 
                                         hidden

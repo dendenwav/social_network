@@ -23,6 +23,12 @@ const Share = (props: DialogProps) => {
     const containerRef = useRef<any>(null);
 
     useEffect(() => {
+        if (picture && !isImageLoaded) {
+            setIsImageLoaded(true);
+        }
+    }, [picture, isImageLoaded]);
+
+    useEffect(() => {
         if(open && isJustOpened) {
             setIsJustOpened(false);
         }

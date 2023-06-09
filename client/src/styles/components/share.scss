@@ -4,7 +4,7 @@
     left: 0;
     bottom: 0;
     right: 0;
-    margin: 40px 80px;
+    margin: 24px 40px;
     border-radius: .5rem;
 
     &.empty {
@@ -50,17 +50,35 @@
             height: 100%;
             
             .image-info {
-                border: 1px solid var(--light-grey);
-                border-radius: .5rem;
                 flex: 1;
-                padding: 24px;
+                display: flex;
+                flex-direction: column;
+                gap: 2rem;
+
+                > * {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    
+                    > *:not(:last-child) {
+                        margin-bottom: 1rem;
+                    }
+                }
+
+                .image-info-ats-container, .image-info-tags-container {
+                    height: auto;
+                    width: 100%;
+                    border-radius: 4px;
+                    border: 1px solid var(--light-grey);
+                    flex: 1;
+                }
             }
 
             .image-overview {
                 position: relative;
                 height: 100%;
-                width: 518px;
-                max-height: 518px;
+                width: 550px;
+                max-height: 550px;
                 border-radius: .5rem;
 
                 .image-overlay {
@@ -87,9 +105,14 @@
         
                 &:hover .image-overlay {
                     opacity: 1;
-                    background-color: rgba(255, 255, 255, 0.5);
+                    background-color: rgba(255, 255, 255, 0.7);
+
                     > * {
                         transform: scale(1);
+
+                        &:hover {
+                            background-color: rgba(255, 255, 255, 0.5);
+                        }
                     }
                 }
             }            
