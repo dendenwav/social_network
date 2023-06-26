@@ -28,8 +28,8 @@ const FirstPageContent = ({picture, setPicture}: FirstPageContentProps) => {
     const [resizeableEle, setResizeableEle] = useState<ResizeableEle>(defaultResizeableEle);
     const [imageResizerHeight, setImageResizerHeight] = useState(window.innerHeight - 64);
     const [imageResizerWidth, setImageResizerWidth] = useState(600);
-    const [backgroundSize, setBackgroundSize] = useState('auto 550px');
-    const [backgroundPosition, setBackgroundPosition] = useState('0 0');
+    const [backgroundSize, setBackgroundSize] = useState('');
+    const [backgroundPosition, setBackgroundPosition] = useState('');
     
     useEffect(() => {
         if (resizeableEle.width > 0 && resizeableEle.height > 0) {
@@ -74,9 +74,6 @@ const FirstPageContent = ({picture, setPicture}: FirstPageContentProps) => {
     };
 
     const setBackgroundSizeAndPosition = (newResizeableEle: ResizeableEle, initialHeight: number, initialWidth: number, resizerHeight: number, resizerWidth: number) => {
-        setImageHeight(initialHeight);
-        setImageWidth(initialWidth);
-
         const maxSide = 550;
         const imageRatio = initialWidth / initialHeight;
         
@@ -152,7 +149,7 @@ const FirstPageContent = ({picture, setPicture}: FirstPageContentProps) => {
     return (        
         <div>
         {
-            (picture !== null) ? (
+            (picture !== null) && backgroundPosition !== '' && backgroundSize !== '' ? (
                 <div className="image-container full">
                     <div className="image-full-content">
                         <div className="image-info">
