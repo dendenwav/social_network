@@ -1,8 +1,8 @@
 export interface IPost {
-    postId: string;
+    postId?: string;
     userId: string;
     message: string;
     selectedFile?: string;
     tags: string[];
-    likes: string[];
+    likes?: string[];
 }

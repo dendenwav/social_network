@@ -1,12 +1,14 @@
 import { Request, Response } from "express";
 
-import PostModel from '../models/PostModel';
-import UserModel from '../models/UserModel';
+import PostRepository from "../../dal/repositories/PostRepository";
+import UserRepository from "../../dal/repositories/userRepository";
+import { CheckIfCurrentUserExist } from "../validations/postValidations";
+import { IPost } from "../../models/_interfaces/PostsInterfaces";
 
 //get all posts
 export const getPosts = async (req: Request, res: Response) => {
     try {
-        const posts = await PostModel.find({});        
+        const posts = await PostRepository.getPosts();
         res.status(200).json(posts);
     } catch (err) {
         console.error(err);
@@ -18,7 +20,7 @@ export const getPosts = async (req: Request, res: Response) => {
 export const getPost = async (req: Request, res: Response) => {
     const postId = req.params.postId;
     try {
-        const post = await PostModel.findById(postId);
+        const post = await PostRepository.getPostById(postId);
         
         if (!post) return res.status(404).json({ error: "Post not found." });
         
@@ -33,11 +35,11 @@ export const getPost = async (req: Request, res: Response) => {
 export const getUserPosts = async (req: Request, res: Response) => {
     const userId = req.params.userId;
     try {
-        const user = await UserModel.findOne({ pseudo: userId });
+        const user = await UserRepository.getUserByPseudo(userId);
 
         if (!user) return res.status(404).json({ error: "User not found." });
 
-        const posts = await PostModel.find({ userId: user.pseudo }).sort({createdAt: -1});
+        const posts = await PostRepository.getUserPosts(user.pseudo);
         
         if (!posts) return res.status(404).json({ error: "User's posts not found." });
 
@@ -52,17 +54,19 @@ export const getUserPosts = async (req: Request, res: Response) => {
 export const getFriendsPosts = async (req: Request, res: Response) => {
     const userId = req.params.userId;
     try {
-        const user = await UserModel.findOne({ pseudo: userId });
+        const user = await UserRepository.getUserByPseudo(userId);
 
         if (!user) return res.status(404).json({ error: "User not found." });
 
-        const userPosts = await PostModel.find({ userId: user.pseudo }).sort({createdAt: -1});
+        const userPosts = await PostRepository.getUserPosts(user.pseudo);
 
         if (!userPosts) return res.status(404).json({ error: "User's posts not found." });
 
+        if (!user.followings) return res.status(404).json({ error: "User's followings not found." });
+
         const friendPosts = await Promise.all(
             user.followings.map((friendId) => {
-                return PostModel.find({ userId: friendId });
+                return PostRepository.getUserPosts(friendId);
             })
         );
 
@@ -78,9 +82,14 @@ export const getFriendsPosts = async (req: Request, res: Response) => {
 //create a post
 export const createPost = async (req: Request, res: Response) => {
     const { message, selectedFile, tags } = req.body;
-    const userId = req.user?.pseudo;
+    const currentUserResult = CheckIfCurrentUserExist(req);
+
+    if (currentUserResult.status !== 200) {
+        return res.status(currentUserResult.status).json(currentUserResult.message);
+    }
+
     try {
-        const newPost = await PostModel.create({ userId, message, selectedFile, tags });
+        const newPost = await PostRepository.createPost({ userId: currentUserResult.pseudo, message, selectedFile, tags });
 
         res.status(200).json(newPost);
     } catch (err) {
@@ -92,20 +101,21 @@ export const createPost = async (req: Request, res: Response) => {
 export const updatePost = async (req: Request, res: Response) => {
     const userId = req.user?.pseudo;
     try {
-        const postToUpdate = await PostModel.findById(req.body._id);
+        const postToUpdate = await PostRepository.getPostById(req.body._id);
 
         if (!postToUpdate) return res.status(404).json({ message: "Post not found." });
 
         if (postToUpdate.userId === userId) {
 
-            const updates:{[key: string]: any} = {};
+            const updates: IPost = postToUpdate;
+
             for (const [key, value] of Object.entries(req.body)) {
                 if (key !== "likes" && key !== "userId") {
-                    updates[key] = value;
+                    (updates as any)[key] = value;
                 }
             }
 
-            await postToUpdate.updateOne({ $set: updates });
+            await PostRepository.updatePost(updates);
             res.status(200).json({message: "the post has been updated"});
         } else {
             res.status(403).json({message: "you can update only your post"});
@@ -117,17 +127,20 @@ export const updatePost = async (req: Request, res: Response) => {
 
 //delete a post
 export const deletePost = async (req: Request, res: Response) => {
+    const pseudo = req.user?.pseudo;
     try {
-        const currentUser = await UserModel.findOne({ pseudo: req.user?.pseudo });
+        if (!pseudo) return res.status(404).json({ message: "currentUser not found." });
+
+        const currentUser = await UserRepository.getUserByPseudo(pseudo);
 
         if (!currentUser) return res.status(404).json({ message: "currentUser not found." });
 
-        const postToDelete = await PostModel.findById(req.body.postId);
+        const postToDelete = await PostRepository.getPostById(req.body.postId);
 
-        if (!postToDelete) return res.status(404).json({ message: "Post not found." });
+        if (!postToDelete || !postToDelete.postId) return res.status(404).json({ message: "Post not found." });
 
         if (postToDelete.userId === currentUser.pseudo || currentUser.isAdmin) {
-            await postToDelete.deleteOne();
+            await PostRepository.deletePost(postToDelete.postId);
             res.status(200).json({message: "the post has been deleted"});
         } else {
             return res.status(403).json({message: "you can delete only your post"});
@@ -144,15 +157,15 @@ export const likePost = async (req: Request, res: Response) => {
     if (!userId) return res.status(404).json({ message: "currentUser not found." });
 
     try {
-        const postToLike = await PostModel.findById(req.body._id);
+        const postToLike = await PostRepository.getPostById(req.body._id);
 
-        if (!postToLike) return res.status(404).json({ message: "Post not found." });
+        if (!postToLike || !postToLike.postId) return res.status(404).json({ message: "Post not found." });
 
-        if (!postToLike.likes.includes(userId)) {
-            await postToLike.updateOne({ $push: { likes: userId } });
+        if (!postToLike.likes?.includes(userId)) {
+            await PostRepository.likePost(postToLike.postId, userId);
             res.status(200).json("The post has been liked");
         } else {
-            await postToLike.updateOne({ $pull: { likes: userId } });
+            await PostRepository.unlikePost(postToLike.postId, userId);
             res.status(200).json("The post has been disliked");
         }
     } catch (err) {

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { IUser } from "./_interfaces/UserInterfaces";
 
-const UserSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema<IUser>(
     { pseudo: {
         type: String,
         require: true,

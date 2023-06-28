@@ -1,6 +1,8 @@
+import { IPost } from './_interfaces/PostsInterfaces';
+
 import mongoose from 'mongoose';
 
-const PostSchema = new mongoose.Schema(
+const PostSchema = new mongoose.Schema<IPost>(
   {
     userId: {
       type: String,

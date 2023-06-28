@@ -12,7 +12,14 @@ export interface ILoginUser {
     password: string;
 }
 
+export interface ILoginResult {
+    _id: string;
+    pseudo: string;
+    email: string;
+}
+
 export interface IUser {
+    _id?: string;
     pseudo: string;
     username?: string;
     email?: string;

@@ -12,7 +12,7 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
 
     try {
         const decodedToken = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET as jwt.Secret) as JwtPayload;
-        req.user = { pseudo: decodedToken.pseudo, email: decodedToken.email, id: decodedToken.id };
+        req.user = { pseudo: decodedToken.pseudo, email: decodedToken.email, _id: decodedToken.id };
         next();
     } catch (err) {
         console.log(err);
