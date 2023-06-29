@@ -5,11 +5,10 @@ import bcrypt from 'bcrypt';
 import { ILoginResult, IRegisterUser } from '../../models/_interfaces/UserInterfaces';
 import UserRepository from '../../dal/repositories/userRepository';
 import { CheckLoginUser, CheckRegisterUser } from '../validations/authValidations';
-import { ILoginReturn, IRegisterReturn } from '../validations/_interfaces';
 
 //REGISTER
 export const registerUser = async (req: Request, res: Response) => {
-    const registerResult: IRegisterReturn =  await CheckRegisterUser(req);
+    const registerResult =  await CheckRegisterUser(req);
     const user: IRegisterUser = registerResult.user;
 
     if (registerResult.status !== 200) {
@@ -41,7 +40,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
 //LOGIN
 export const loginUser = async (req: Request, res: Response) => {
-    const loginResult: ILoginReturn =  await CheckLoginUser(req);
+    const loginResult =  await CheckLoginUser(req);
     const user: ILoginResult = loginResult.user;
 
     if (loginResult.status !== 200) {

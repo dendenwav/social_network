@@ -8,19 +8,24 @@ class UserRepository {
     }
 
     public static async getUsers(elementsToIgnored?: Object): Promise<IUser[]> {
-        return UserModel.find({}, elementsToIgnored);
+        return await UserModel.find({}, elementsToIgnored);
     }
 
     public static async getUserByPseudo(pseudo: string, elementsToIgnored?: Object): Promise<IUser | null> {
-        return UserModel.findOne({ pseudo: pseudo }, elementsToIgnored);
+        return  await UserModel.findOne({ pseudo: pseudo }, elementsToIgnored);
     }
 
     public static async getUserByEmail(email: string): Promise<IUser | null> {
-        return UserModel.findOne({ email: email });
+        return await UserModel.findOne({ email: email });
     }
 
-    public static async updateUser(updatedUserData: IUser): Promise<IUser | null> {
-        return UserModel.findByIdAndUpdate(updatedUserData._id, updatedUserData, { new: true });
+    public static async updateUser(updatedUserData: IUser): Promise<IUser> {
+        const resultUser = await UserModel.findByIdAndUpdate(updatedUserData._id, updatedUserData, { new: true });
+        const emptyUser: IUser = {
+            pseudo: "",
+        };
+        if (resultUser) return resultUser;
+        return emptyUser;
     }
 
     public static async deleteUser(userId: string): Promise<IUser | null> {

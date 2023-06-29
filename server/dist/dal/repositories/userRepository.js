@@ -10,16 +10,22 @@ class UserRepository {
         return newUser.save();
     }
     static async getUsers(elementsToIgnored) {
-        return UserModel_1.default.find({}, elementsToIgnored);
+        return await UserModel_1.default.find({}, elementsToIgnored);
     }
     static async getUserByPseudo(pseudo, elementsToIgnored) {
-        return UserModel_1.default.findOne({ pseudo: pseudo }, elementsToIgnored);
+        return await UserModel_1.default.findOne({ pseudo: pseudo }, elementsToIgnored);
     }
     static async getUserByEmail(email) {
-        return UserModel_1.default.findOne({ email: email });
+        return await UserModel_1.default.findOne({ email: email });
     }
     static async updateUser(updatedUserData) {
-        return UserModel_1.default.findByIdAndUpdate(updatedUserData._id, updatedUserData, { new: true });
+        const resultUser = await UserModel_1.default.findByIdAndUpdate(updatedUserData._id, updatedUserData, { new: true });
+        const emptyUser = {
+            pseudo: "",
+        };
+        if (resultUser)
+            return resultUser;
+        return emptyUser;
     }
     static async deleteUser(userId) {
         return UserModel_1.default.findByIdAndDelete(userId);

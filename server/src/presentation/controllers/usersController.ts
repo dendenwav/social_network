@@ -3,6 +3,7 @@ import UserRepository from "../../dal/repositories/userRepository";
 import { Request, Response } from "express";
 import bcrypt from 'bcrypt';
 import { IUser } from "../../models/_interfaces/UserInterfaces";
+import { CheckDeleteUser, CheckFollowUser, CheckGetUser, CheckUpdateUser } from "../validations/userValidations";
 
 //get users
 export const getUsers = async (req: Request, res: Response) => {
@@ -17,91 +18,59 @@ export const getUsers = async (req: Request, res: Response) => {
 
 //get a user
 export const getUser = async (req: Request, res: Response) => {
-    const pseudo = req.params.id;
-    try {
-        const user = await UserRepository.getUserByPseudo(pseudo, { email: 0, password: 0, updatedAt: 0 });
+    const CheckGetUserResult = await CheckGetUser(req);
+    const user = CheckGetUserResult.user;
 
-        if (!user) return res.status(404).json({ error: "User not found" });
-        res.status(200).json(user);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Could not retrieve user" });
+    if (CheckGetUserResult.status !== 200) {
+        return res.status(CheckGetUserResult.status).json({message: CheckGetUserResult.message});
     }
+
+    res.status(200).json(user);
 };
 
 //update user
 export const updateUser = async (req: Request, res: Response) => {
-    const pseudo = req.user?.pseudo;
+    const CheckUpdateUserResult = await CheckUpdateUser(req);
+    const userToUpdate = CheckUpdateUserResult.user;
+
+    if (CheckUpdateUserResult.status !== 200) {
+        return res.status(CheckUpdateUserResult.status).json({message: CheckUpdateUserResult.message});
+    }
+
     try {
-        if (!pseudo) return res.status(404).json({ message: "currentUser not found." });
-
-        const currentUser = await UserRepository.getUserByPseudo(pseudo);
-    
-        if (!currentUser) return res.status(404).json({ message: "currentUser not found." });
-
-        const userToUpdate = await UserRepository.getUserByPseudo(req.body.userId);
-
-        if (!userToUpdate) return res.status(404).json({ message: "User not found." });
-
-        if (currentUser.pseudo === userToUpdate.pseudo || currentUser.isAdmin) {
-
-            const updates: IUser = userToUpdate;
-            for (const [key, value] of Object.entries(req.body)) {
-                if (key !== "userId" && key !== "isAdmin") {
-                    (updates as any)[key] = value;
-                }
+        const updates: IUser = userToUpdate;
+        for (const [key, value] of Object.entries(req.body)) {
+            if (key !== "userId" && key !== "isAdmin") {
+                (updates as any)[key] = value;
             }
+        }
 
-            if (updates.password) {
-                try {
-                    const salt = await bcrypt.genSalt(10);
-                    updates.password = await bcrypt.hash(updates.password, salt);
-                } catch (err) {
-                    console.error(err);
-                    return res.status(500).json({ error: "Could not hash password" });
-                }
-            }
-
+        if (updates.password) {
             try {
-                const userUpdated = await UserRepository.updateUser(updates);
-
-                if (!userUpdated) return res.status(404).json({ error: "User not found ? (bizarre...)" });
-
-                res.status(200).json({ message: "Account has been updated" });
-
+                const salt = await bcrypt.genSalt(10);
+                updates.password = await bcrypt.hash(updates.password, salt);
             } catch (err) {
                 console.error(err);
-                return res.status(500).json({ error: "Could not update user" });
+                return res.status(500).json({ error: "Could not hash password" });
             }
-            
-        } else {
-            return res.status(403).json({ error: "You can only update your own account" });
         }
+
+        await UserRepository.updateUser(updates);
+        res.status(200).json({ message: "Account has been updated" });
+
     } catch (error) {
         return res.status(500).json({ message: "An error occurred while updating the user" });
     }    
 };
 
 //delete user
-export const deleteUser = async (req: Request, res: Response) => {  
-    const pseudo = req.user?.pseudo;
+export const deleteUser = async (req: Request, res: Response) => {
+    const CheckDeleteUserResult = await CheckDeleteUser(req);
+    const pseudo = CheckDeleteUserResult.pseudo;
+
     try {
-        if (!pseudo) return res.status(404).json({ message: "currentUser not found." });
-
-        const currentUser = await UserRepository.getUserByPseudo(pseudo);
-    
-        if (!currentUser) return res.status(404).json({ message: "currentUser not found." });
-
-        const userToDelete = await UserRepository.getUserByPseudo(req.params.id);
-    
-        if (!userToDelete) return res.status(404).json({ message: "User not found." });
-
-        if (currentUser.pseudo === userToDelete.pseudo || currentUser.isAdmin) {
-            await UserRepository.deleteUser(userToDelete.pseudo);
-            return res.status(200).json({ message: "Account has been deleted." });
-        } else {
-            return res.status(403).json({ message: "You can delete only your account." });
-        }
+        await UserRepository.deleteUser(pseudo);
+        return res.status(200).json({ message: "Account has been deleted." });
     } catch (err) {
         return res.status(500).json({ message: "An error occurred while deleting the user" });
     }
@@ -109,63 +78,27 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 //follow a user
 export const followUser = async (req: Request, res: Response) => {
-    const pseudo = req.user?.pseudo;
-    try {
-        if (!pseudo) return res.status(404).json({ message: "currentUser not found." });
+    const CheckFollowUserResult = await CheckFollowUser(req);
+    const currentPseudo = CheckFollowUserResult.currentPseudo;
+    const userToFollowPseudo = CheckFollowUserResult.userToFollowPseudo;
 
-        const currentUser = await UserRepository.getUserByPseudo(pseudo);
-    
-        if (!currentUser) return res.status(404).json({ message: "currentUser not found." });
-
-        const userToFollow = await UserRepository.getUserByPseudo(req.params.id);
-    
-        if (!userToFollow) return res.status(404).json({ message: "User not found." });
-
-        if (currentUser.pseudo === userToFollow.pseudo) return res.status(403).json({ message: "You can't follow yourself." });
-
-        if (!currentUser.followings || !userToFollow.followers) return res.status(500).json({ message: "A data inconsistency has occurred. Please retry the operation." });
-
-        if (!currentUser.followings.includes(userToFollow.pseudo as string) && !userToFollow.followers.includes(currentUser.pseudo as string)) {
-            await UserRepository.followUser(currentUser.pseudo, userToFollow.pseudo);
-            return res.status(200).json({ message: "User has been followed." });
-        } else if (currentUser.followings.includes(userToFollow.pseudo as string) && userToFollow.followers.includes(currentUser.pseudo as string)) {
-            return res.status(403).json({ message: "You already follow this user." });
-        } else {
-            await UserRepository.unfollowUser(currentUser.pseudo, userToFollow.pseudo);
-            return res.status(500).json({ message: "A data inconsistency has occurred. By default, you won't follow the user you're trying to follow. Please retry the operation if you really want to follow it." });
-        }
+    try {        
+        await UserRepository.followUser(currentPseudo, userToFollowPseudo);
+        return res.status(200).json({ message: "User has been followed." });        
     } catch (err) {
         return res.status(500).json({ message: "An error occurred while following to this user." });
     }
 };
 
 //unfollow a user
-export const unfollowUser = async (req: Request, res: Response) => {    
-    const pseudo = req.user?.pseudo;
-    try {
-        if (!pseudo) return res.status(404).json({ message: "currentUser not found." });
+export const unfollowUser = async (req: Request, res: Response) => {
+    const CheckFollowUserResult = await CheckFollowUser(req);
+    const currentPseudo = CheckFollowUserResult.currentPseudo;
+    const userToUnfollowPseudo = CheckFollowUserResult.userToFollowPseudo;
 
-        const currentUser = await UserRepository.getUserByPseudo(pseudo);
-    
-        if (!currentUser) return res.status(404).json({ message: "currentUser not found." });
-        
-        const userToUnfollow = await UserRepository.getUserByPseudo(req.params.id);
-    
-        if (!userToUnfollow) return res.status(404).json({ message: "User not found." });
-        
-        if (currentUser.pseudo === userToUnfollow.pseudo) return res.status(403).json({ message: "You can't unfollow yourself." });
-
-        if (!currentUser.followings || !userToUnfollow.followers) return res.status(500).json({ message: "A data inconsistency has occurred. Please retry the operation." });
-
-        if (currentUser.followings.includes(userToUnfollow.pseudo as string) && userToUnfollow.followers.includes(currentUser.pseudo as string)) {
-            await UserRepository.unfollowUser(currentUser.pseudo, userToUnfollow.pseudo);
-            return res.status(200).json({ message: "User has been unfollowed." });
-        } else if (!currentUser.followings.includes(userToUnfollow.pseudo as string) && !userToUnfollow.followers.includes(currentUser.pseudo as string)) {
-            return res.status(403).json({ message: "You already don't follow this user." });
-        } else {
-            await UserRepository.unfollowUser(currentUser.pseudo, userToUnfollow.pseudo);
-            return res.status(500).json({ message: "A data inconsistency has occurred. By default, you won't follow the user you're trying to follow." });
-        }
+    try {        
+        await UserRepository.unfollowUser(currentPseudo, userToUnfollowPseudo);
+        return res.status(200).json({ message: "User has been unfollowed." });
     } catch (err) {
         return res.status(500).json({ message: "An error occurred while following to this user." });
     }

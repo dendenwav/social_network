@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as PostsInterfaces from '../../../server/src/models/_interfaces/PostsInterfaces';
-import { IUser, ILoginUser, IRegisterUser } from '../../../server/src/models/_interfaces/UsersInterfaces';
+import { IUser, ILoginUser, IRegisterUser } from '../../../server/src/models/_interfaces/UserInterfaces';
 
 const apiBaseURL = 'http://localhost:5000';
 
@@ -15,7 +15,7 @@ export const getFriendsPosts = (user: IUser) => API.get(`${postRoot}/friends/${u
 export const createPost = (newPost: PostsInterfaces.IPost) => API.post(`${postRoot}`, newPost, { withCredentials: true });
 export const updatePost = (updatedPost: PostsInterfaces.IPost) => API.put(`${postRoot}`, updatedPost, { withCredentials: true });
 export const deletePost = (postToDelete: PostsInterfaces.IPost) => API.delete(`${postRoot}/${postToDelete.postId}`, { withCredentials: true });
-export const likePost = (postToLike: PostsInterfaces.IPost) => API.put(`${postRoot}/like`, postToLike, { withCredentials: true });
+export const likePost = (postToLike: PostsInterfaces.IPost) => API.put(`${postRoot}/like`, postToLike.postId, { withCredentials: true });
 
 const userRoot = '/users';
 

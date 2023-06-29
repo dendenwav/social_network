@@ -2,10 +2,10 @@ import { Request } from 'express';
 import bcrypt from 'bcrypt';
 
 import { ILoginResult, ILoginUser, IRegisterUser, IUser } from '../../models/_interfaces/UserInterfaces';
-import { ILoginReturn, IRegisterReturn } from './_interfaces';
+import { ILoginUserReturn, IRegisterUserReturn } from './_interfaces';
 import UserRepository from '../../dal/repositories/userRepository';
 
-export const CheckRegisterUser = async (req: Request): Promise<IRegisterReturn> => {
+export const CheckRegisterUser = async (req: Request): Promise<IRegisterUserReturn> => {
     const user: IRegisterUser = req.body;
     const emptyUser: IRegisterUser = { pseudo: "", email: "", password: "", confirmPassword: "", firstName: "", lastName: "" };
     
@@ -53,7 +53,7 @@ export const CheckRegisterUser = async (req: Request): Promise<IRegisterReturn> 
 
 };
 
-export const CheckLoginUser = async (req: Request): Promise<ILoginReturn> => {
+export const CheckLoginUser = async (req: Request): Promise<ILoginUserReturn> => {
     const user: ILoginUser = req.body;
     const emptyUser: ILoginResult = { _id: "", pseudo: "", email: "" };
     

@@ -79,13 +79,13 @@ const getFriendsPosts = async (req, res) => {
 exports.getFriendsPosts = getFriendsPosts;
 //create a post
 const createPost = async (req, res) => {
-    const { message, selectedFile, tags } = req.body;
-    const currentUserResult = (0, postValidations_1.CheckIfCurrentUserExist)(req);
-    if (currentUserResult.status !== 200) {
-        return res.status(currentUserResult.status).json(currentUserResult.message);
+    const checkCreateResult = await (0, postValidations_1.CheckCreatePost)(req);
+    const post = checkCreateResult.post;
+    if (checkCreateResult.status !== 200) {
+        return res.status(checkCreateResult.status).json({ message: checkCreateResult.message });
     }
     try {
-        const newPost = await PostRepository_1.default.createPost({ userId: currentUserResult.pseudo, message, selectedFile, tags });
+        const newPost = await PostRepository_1.default.createPost({ userId: post.userId, message: post.message, selectedFile: post.selectedFile, tags: post.tags });
         res.status(200).json(newPost);
     }
     catch (err) {
@@ -95,49 +95,36 @@ const createPost = async (req, res) => {
 exports.createPost = createPost;
 //update a post
 const updatePost = async (req, res) => {
-    const userId = req.user?.pseudo;
+    const CheckUpdatePostResult = await (0, postValidations_1.CheckUpdatePost)(req);
+    const post = CheckUpdatePostResult.post;
+    if (CheckUpdatePostResult.status !== 200) {
+        return res.status(CheckUpdatePostResult.status).json({ message: CheckUpdatePostResult.message });
+    }
     try {
-        const postToUpdate = await PostRepository_1.default.getPostById(req.body._id);
-        if (!postToUpdate)
-            return res.status(404).json({ message: "Post not found." });
-        if (postToUpdate.userId === userId) {
-            const updates = postToUpdate;
-            for (const [key, value] of Object.entries(req.body)) {
-                if (key !== "likes" && key !== "userId") {
-                    updates[key] = value;
-                }
+        const updates = post;
+        for (const [key, value] of Object.entries(req.body)) {
+            if (key !== "likes" && key !== "userId") {
+                updates[key] = value;
             }
-            await PostRepository_1.default.updatePost(updates);
-            res.status(200).json({ message: "the post has been updated" });
         }
-        else {
-            res.status(403).json({ message: "you can update only your post" });
-        }
+        await PostRepository_1.default.updatePost(updates);
+        res.status(200).json({ message: "the post has been updated" });
     }
     catch (err) {
-        res.status(500).json(err);
+        return res.status(500).json({ message: "Error during post update." });
     }
 };
 exports.updatePost = updatePost;
 //delete a post
 const deletePost = async (req, res) => {
-    const pseudo = req.user?.pseudo;
+    const CheckDeletePostResult = await (0, postValidations_1.CheckDeletePost)(req);
+    const postId = CheckDeletePostResult.postId;
+    if (CheckDeletePostResult.status !== 200) {
+        return res.status(CheckDeletePostResult.status).json({ message: CheckDeletePostResult.message });
+    }
     try {
-        if (!pseudo)
-            return res.status(404).json({ message: "currentUser not found." });
-        const currentUser = await userRepository_1.default.getUserByPseudo(pseudo);
-        if (!currentUser)
-            return res.status(404).json({ message: "currentUser not found." });
-        const postToDelete = await PostRepository_1.default.getPostById(req.body.postId);
-        if (!postToDelete || !postToDelete.postId)
-            return res.status(404).json({ message: "Post not found." });
-        if (postToDelete.userId === currentUser.pseudo || currentUser.isAdmin) {
-            await PostRepository_1.default.deletePost(postToDelete.postId);
-            res.status(200).json({ message: "the post has been deleted" });
-        }
-        else {
-            return res.status(403).json({ message: "you can delete only your post" });
-        }
+        await PostRepository_1.default.deletePost(postId);
+        res.status(200).json({ message: "the post has been deleted" });
     }
     catch (err) {
         return res.status(500).json({ message: "An error occurred while deleting the post" });
@@ -146,19 +133,20 @@ const deletePost = async (req, res) => {
 exports.deletePost = deletePost;
 // like/dislike a post
 const likePost = async (req, res) => {
-    const userId = req.user?.pseudo;
-    if (!userId)
-        return res.status(404).json({ message: "currentUser not found." });
+    const CheckLikePostResult = await (0, postValidations_1.CheckLikePost)(req);
+    const post = CheckLikePostResult.post;
+    const postId = CheckLikePostResult.postId;
+    const userId = CheckLikePostResult.userId;
+    if (CheckLikePostResult.status !== 200) {
+        return res.status(CheckLikePostResult.status).json({ message: CheckLikePostResult.message });
+    }
     try {
-        const postToLike = await PostRepository_1.default.getPostById(req.body._id);
-        if (!postToLike || !postToLike.postId)
-            return res.status(404).json({ message: "Post not found." });
-        if (!postToLike.likes?.includes(userId)) {
-            await PostRepository_1.default.likePost(postToLike.postId, userId);
+        if (!post.likes?.includes(userId)) {
+            await PostRepository_1.default.likePost(postId, userId);
             res.status(200).json("The post has been liked");
         }
         else {
-            await PostRepository_1.default.unlikePost(postToLike.postId, userId);
+            await PostRepository_1.default.unlikePost(postId, userId);
             res.status(200).json("The post has been disliked");
         }
     }

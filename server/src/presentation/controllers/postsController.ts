@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import PostRepository from "../../dal/repositories/PostRepository";
 import UserRepository from "../../dal/repositories/userRepository";
-import { CheckIfCurrentUserExist } from "../validations/postValidations";
+import { CheckCreatePost, CheckDeletePost, CheckLikePost, CheckUpdatePost } from "../validations/postValidations";
 import { IPost } from "../../models/_interfaces/PostsInterfaces";
 
 //get all posts
@@ -81,15 +81,15 @@ export const getFriendsPosts = async (req: Request, res: Response) => {
 
 //create a post
 export const createPost = async (req: Request, res: Response) => {
-    const { message, selectedFile, tags } = req.body;
-    const currentUserResult = CheckIfCurrentUserExist(req);
+    const checkCreateResult = await CheckCreatePost(req);
+    const post = checkCreateResult.post;
 
-    if (currentUserResult.status !== 200) {
-        return res.status(currentUserResult.status).json(currentUserResult.message);
+    if (checkCreateResult.status !== 200) {
+        return res.status(checkCreateResult.status).json({message: checkCreateResult.message});
     }
 
     try {
-        const newPost = await PostRepository.createPost({ userId: currentUserResult.pseudo, message, selectedFile, tags });
+        const newPost = await PostRepository.createPost({ userId: post.userId, message: post.message, selectedFile: post.selectedFile, tags: post.tags });
 
         res.status(200).json(newPost);
     } catch (err) {
@@ -99,52 +99,41 @@ export const createPost = async (req: Request, res: Response) => {
 
 //update a post
 export const updatePost = async (req: Request, res: Response) => {
-    const userId = req.user?.pseudo;
+    const CheckUpdatePostResult = await CheckUpdatePost(req);
+    const post = CheckUpdatePostResult.post;
+
+    if (CheckUpdatePostResult.status !== 200) {
+        return res.status(CheckUpdatePostResult.status).json({message: CheckUpdatePostResult.message});
+    }
+
     try {
-        const postToUpdate = await PostRepository.getPostById(req.body._id);
+        const updates: IPost = post;
 
-        if (!postToUpdate) return res.status(404).json({ message: "Post not found." });
-
-        if (postToUpdate.userId === userId) {
-
-            const updates: IPost = postToUpdate;
-
-            for (const [key, value] of Object.entries(req.body)) {
-                if (key !== "likes" && key !== "userId") {
-                    (updates as any)[key] = value;
-                }
+        for (const [key, value] of Object.entries(req.body)) {
+            if (key !== "likes" && key !== "userId") {
+                (updates as any)[key] = value;
             }
-
-            await PostRepository.updatePost(updates);
-            res.status(200).json({message: "the post has been updated"});
-        } else {
-            res.status(403).json({message: "you can update only your post"});
         }
+
+        await PostRepository.updatePost(updates);
+        res.status(200).json({message: "the post has been updated"});
     } catch (err) {
-        res.status(500).json(err);
+        return res.status(500).json({message: "Error during post update."});
     }
 };
 
 //delete a post
 export const deletePost = async (req: Request, res: Response) => {
-    const pseudo = req.user?.pseudo;
+    const CheckDeletePostResult = await CheckDeletePost(req);
+    const postId = CheckDeletePostResult.postId;
+
+    if (CheckDeletePostResult.status !== 200) {
+        return res.status(CheckDeletePostResult.status).json({message: CheckDeletePostResult.message});
+    }
+
     try {
-        if (!pseudo) return res.status(404).json({ message: "currentUser not found." });
-
-        const currentUser = await UserRepository.getUserByPseudo(pseudo);
-
-        if (!currentUser) return res.status(404).json({ message: "currentUser not found." });
-
-        const postToDelete = await PostRepository.getPostById(req.body.postId);
-
-        if (!postToDelete || !postToDelete.postId) return res.status(404).json({ message: "Post not found." });
-
-        if (postToDelete.userId === currentUser.pseudo || currentUser.isAdmin) {
-            await PostRepository.deletePost(postToDelete.postId);
-            res.status(200).json({message: "the post has been deleted"});
-        } else {
-            return res.status(403).json({message: "you can delete only your post"});
-        }
+        await PostRepository.deletePost(postId);
+        res.status(200).json({message: "the post has been deleted"});
     } catch (err) {
         return res.status(500).json({ message: "An error occurred while deleting the post" });
     }
@@ -152,20 +141,21 @@ export const deletePost = async (req: Request, res: Response) => {
 
 // like/dislike a post
 export const likePost = async (req: Request, res: Response) => {
-    const userId = req.user?.pseudo;
-    
-    if (!userId) return res.status(404).json({ message: "currentUser not found." });
+    const CheckLikePostResult = await CheckLikePost(req);
+    const post = CheckLikePostResult.post;
+    const postId = CheckLikePostResult.postId;
+    const userId = CheckLikePostResult.userId;
+
+    if (CheckLikePostResult.status !== 200) {
+        return res.status(CheckLikePostResult.status).json({message: CheckLikePostResult.message});
+    }
 
     try {
-        const postToLike = await PostRepository.getPostById(req.body._id);
-
-        if (!postToLike || !postToLike.postId) return res.status(404).json({ message: "Post not found." });
-
-        if (!postToLike.likes?.includes(userId)) {
-            await PostRepository.likePost(postToLike.postId, userId);
+        if (!post.likes?.includes(userId)) {
+            await PostRepository.likePost(postId, userId);
             res.status(200).json("The post has been liked");
         } else {
-            await PostRepository.unlikePost(postToLike.postId, userId);
+            await PostRepository.unlikePost(postId, userId);
             res.status(200).json("The post has been disliked");
         }
     } catch (err) {
