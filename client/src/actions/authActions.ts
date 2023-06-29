@@ -3,7 +3,7 @@ import { Dispatch } from 'react';
 import { SnackbarMessage, OptionsObject, SnackbarKey } from 'notistack';
 
 import { AUTH, LOGOUT } from '../constants/actionTypes';
-import { IRegisterUser, ILoginUser } from '../../../server/src/models/_interfaces/UsersInterfaces';
+import { IRegisterUser, ILoginUser } from '../../../server/src/models/_interfaces/UserInterfaces';
 import * as Interfaces from './_interfaces';
 import * as Api from '../api/api';
 

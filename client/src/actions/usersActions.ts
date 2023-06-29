@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 
-import { IUser } from '../../../server/src/models/_interfaces/UsersInterfaces';
+import { IUser } from '../../../server/src/models/_interfaces/UserInterfaces';
 import * as Api from '../api/api';
 
 export const getUser = async (pseudo: string) => {

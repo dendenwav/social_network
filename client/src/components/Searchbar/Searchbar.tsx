@@ -5,7 +5,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from '@mui/icons-material/Clear';
 
 import { getUsers } from "../../actions/usersActions";
-import * as UsersInterfaces from "../../../../server/src/models/_interfaces/UsersInterfaces";
+import * as UsersInterfaces from "../../../../server/src/models/_interfaces/UserInterfaces";
 
 export default function SearchBar() {    
     const [users, setUsers] = useState<UsersInterfaces.IUser[]>([]);
