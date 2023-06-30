@@ -14,6 +14,8 @@ export interface IUserReturn extends ICheckReturn { user: IUser }
 
 export interface IPostReturn extends ICheckReturn { post: IPost }
 
+export interface IPostsReturn extends ICheckReturn { posts: IPost[] }
+
 export interface IPseudoReturn extends ICheckReturn { pseudo: string }
 
 export interface IPostIdReturn extends ICheckReturn { postId: string }

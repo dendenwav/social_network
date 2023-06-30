@@ -6,7 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const postsController_1 = require("../controllers/postsController");
 const authMiddleware_1 = __importDefault(require("../middlewares/authMiddleware"));
+// Création du routeur
 const router = express_1.default.Router();
+// Définition des routes
 router.get("/", postsController_1.getPosts);
 router.get("/:postId", postsController_1.getPost);
 router.get("/user/:userId", postsController_1.getUserPosts);

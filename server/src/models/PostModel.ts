@@ -1,7 +1,7 @@
 import { IPost } from './_interfaces/PostsInterfaces';
-
 import mongoose from 'mongoose';
 
+// Définition du schéma de la collection 'posts' dans MongoDB
 const PostSchema = new mongoose.Schema<IPost>(
   {
     userId: {
@@ -23,9 +23,10 @@ const PostSchema = new mongoose.Schema<IPost>(
       default: [],
     },
   },
-  { timestamps: true }
+  { timestamps: true } // Ajout des timestamps pour les dates de création et de mise à jour
 );
 
-const PostModel =  mongoose.model('Post', PostSchema);
+// Création du modèle basé sur le schéma défini
+const PostModel = mongoose.model('Post', PostSchema);
 
 export default PostModel;

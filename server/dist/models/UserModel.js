@@ -4,16 +4,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
-const UserSchema = new mongoose_1.default.Schema({ pseudo: {
+// Définition du schéma de la collection 'users' dans MongoDB
+const UserSchema = new mongoose_1.default.Schema({
+    pseudo: {
         type: String,
-        require: true,
+        required: true,
         min: 3,
         max: 20,
         unique: true,
     },
     username: {
         type: String,
-        require: true,
+        required: true,
         min: 3,
         max: 25,
     },
@@ -67,6 +69,9 @@ const UserSchema = new mongoose_1.default.Schema({ pseudo: {
     relationship: {
         type: Number,
         enum: [1, 2, 3],
-    } }, { timestamps: true });
+    },
+}, { timestamps: true } // Ajout des timestamps pour les dates de création et de mise à jour
+);
+// Création du modèle basé sur le schéma défini
 const UserModel = mongoose_1.default.model('User', UserSchema);
 exports.default = UserModel;
