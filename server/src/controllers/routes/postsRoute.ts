@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { getPost, getPosts, getFriendsPosts, getUserPosts, createPost, updatePost, deletePost, likePost } from '../controllers/postsController';
+import { getPost, getPosts, getFriendsPosts, getUserPosts, createPost, updatePost, deletePost, likePost } from '../postsController';
 import auth from '../middlewares/authMiddleware';
 
 // Création du routeur

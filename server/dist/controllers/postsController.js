@@ -4,12 +4,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.likePost = exports.deletePost = exports.updatePost = exports.createPost = exports.getFriendsPosts = exports.getUserPosts = exports.getPost = exports.getPosts = void 0;
-const PostModel_1 = __importDefault(require("../models/PostModel"));
-const UserModel_1 = __importDefault(require("../models/UserModel"));
-//get all posts
+const PostRepository_1 = __importDefault(require("./../repositories/PostRepository"));
+const postValidations_1 = require("./validations/postValidations");
+/**
+ * Fonction pour obtenir tous les posts
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const getPosts = async (req, res) => {
     try {
-        const posts = await PostModel_1.default.find({});
+        // Récupération de tous les posts
+        const posts = await PostRepository_1.default.getPosts();
         res.status(200).json(posts);
     }
     catch (err) {
@@ -18,68 +23,67 @@ const getPosts = async (req, res) => {
     }
 };
 exports.getPosts = getPosts;
-//get a post
+/**
+ * Fonction pour obtenir un post par son id
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const getPost = async (req, res) => {
-    const postId = req.params.postId;
-    try {
-        const post = await PostModel_1.default.findById(postId);
-        if (!post)
-            return res.status(404).json({ error: "Post not found." });
-        res.status(200).json(post);
+    // Vérification des données de récupération du post
+    const CheckGetPostResult = await (0, postValidations_1.CheckGetPost)(req);
+    // Récupération du post
+    const post = CheckGetPostResult.post;
+    if (CheckGetPostResult.status !== 200) {
+        return res.status(CheckGetPostResult.status).json({ message: CheckGetPostResult.message });
     }
-    catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Could not retrieve post." });
-    }
+    res.status(200).json(post);
 };
 exports.getPost = getPost;
-//get user's posts
+/**
+ * Fonction pour obtenir tous les posts d'un utilisateur par son id
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const getUserPosts = async (req, res) => {
-    const userId = req.params.userId;
-    try {
-        const user = await UserModel_1.default.findOne({ pseudo: userId });
-        if (!user)
-            return res.status(404).json({ error: "User not found." });
-        const posts = await PostModel_1.default.find({ userId: user.pseudo }).sort({ createdAt: -1 });
-        if (!posts)
-            return res.status(404).json({ error: "User's posts not found." });
-        res.status(200).json(posts);
+    // Vérification des données de récupération des posts de l'utilisateur
+    const CheckGetUserPostsResult = await (0, postValidations_1.CheckGetUserPosts)(req);
+    // Récupération des posts de l'utilisateur
+    const posts = CheckGetUserPostsResult.posts;
+    if (CheckGetUserPostsResult.status !== 200) {
+        return res.status(CheckGetUserPostsResult.status).json({ message: CheckGetUserPostsResult.message });
     }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ error: "Could not retrieve user's posts." });
-    }
+    res.status(200).json(posts);
 };
 exports.getUserPosts = getUserPosts;
-//get all posts from user and followings
+/**
+ * Fonction pour obtenir tous les posts d'un utilisateur et de ses amis par son id
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const getFriendsPosts = async (req, res) => {
-    const userId = req.params.userId;
-    try {
-        const user = await UserModel_1.default.findOne({ pseudo: userId });
-        if (!user)
-            return res.status(404).json({ error: "User not found." });
-        const userPosts = await PostModel_1.default.find({ userId: user.pseudo }).sort({ createdAt: -1 });
-        if (!userPosts)
-            return res.status(404).json({ error: "User's posts not found." });
-        const friendPosts = await Promise.all(user.followings.map((friendId) => {
-            return PostModel_1.default.find({ userId: friendId });
-        }));
-        if (!friendPosts)
-            return res.status(404).json({ error: "User's friends posts not found." });
-        res.status(200).json(userPosts.concat(...friendPosts));
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ error: "Could not retrieve user's friends posts." });
-    }
+    // Vérification des données de récupération des posts de l'utilisateur et de ses amis
+    const CheckGetFriendsPostsResult = await (0, postValidations_1.CheckGetFriendsPosts)(req);
+    // Récupération des posts de l'utilisateur et de ses amis
+    const posts = CheckGetFriendsPostsResult.posts;
+    res.status(200).json(posts);
 };
 exports.getFriendsPosts = getFriendsPosts;
-//create a post
+/**
+ * Fonction pour créer un post
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const createPost = async (req, res) => {
-    const { message, selectedFile, tags } = req.body;
-    const userId = req.user?.pseudo;
+    // Verification des données de création du post
+    const checkCreateResult = await (0, postValidations_1.CheckCreatePost)(req);
+    // Récupération du post
+    const post = checkCreateResult.post;
+    if (checkCreateResult.status !== 200) {
+        return res.status(checkCreateResult.status).json({ message: checkCreateResult.message });
+    }
     try {
-        const newPost = await PostModel_1.default.create({ userId, message, selectedFile, tags });
+        // Création du post
+        const newPost = await PostRepository_1.default.createPost({ userId: post.userId, message: post.message, selectedFile: post.selectedFile, tags: post.tags });
         res.status(200).json(newPost);
     }
     catch (err) {
@@ -87,69 +91,86 @@ const createPost = async (req, res) => {
     }
 };
 exports.createPost = createPost;
-//update a post
+/**
+ * Fonction pour modifier un post
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const updatePost = async (req, res) => {
-    const userId = req.user?.pseudo;
+    // Vérification des données de modification du post
+    const CheckUpdatePostResult = await (0, postValidations_1.CheckUpdatePost)(req);
+    // Récupération du post
+    const post = CheckUpdatePostResult.post;
+    if (CheckUpdatePostResult.status !== 200) {
+        return res.status(CheckUpdatePostResult.status).json({ message: CheckUpdatePostResult.message });
+    }
     try {
-        const postToUpdate = await PostModel_1.default.findById(req.body._id);
-        if (!postToUpdate)
-            return res.status(404).json({ message: "Post not found." });
-        if (postToUpdate.userId === userId) {
-            const updates = {};
-            for (const [key, value] of Object.entries(req.body)) {
-                if (key !== "likes" && key !== "userId") {
-                    updates[key] = value;
-                }
+        // Création de l'objet de mise à jour
+        const updates = post;
+        // Parcours des données à modifier
+        for (const [key, value] of Object.entries(req.body)) {
+            // Exclusion des données à ne pas modifier
+            if (key !== "likes" && key !== "userId") {
+                updates[key] = value;
             }
-            await postToUpdate.updateOne({ $set: updates });
-            res.status(200).json({ message: "the post has been updated" });
         }
-        else {
-            res.status(403).json({ message: "you can update only your post" });
-        }
+        // Mise à jour du post
+        await PostRepository_1.default.updatePost(updates);
+        res.status(200).json({ message: "the post has been updated" });
     }
     catch (err) {
-        res.status(500).json(err);
+        return res.status(500).json({ message: "Error during post update." });
     }
 };
 exports.updatePost = updatePost;
-//delete a post
+/**
+ * Fonction pour supprimer un post
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const deletePost = async (req, res) => {
+    // Vérification des données de suppression du post
+    const CheckDeletePostResult = await (0, postValidations_1.CheckDeletePost)(req);
+    // Récupération de l'id du post
+    const postId = CheckDeletePostResult.postId;
+    if (CheckDeletePostResult.status !== 200) {
+        return res.status(CheckDeletePostResult.status).json({ message: CheckDeletePostResult.message });
+    }
     try {
-        const currentUser = await UserModel_1.default.findOne({ pseudo: req.user?.pseudo });
-        if (!currentUser)
-            return res.status(404).json({ message: "currentUser not found." });
-        const postToDelete = await PostModel_1.default.findById(req.body.postId);
-        if (!postToDelete)
-            return res.status(404).json({ message: "Post not found." });
-        if (postToDelete.userId === currentUser.pseudo || currentUser.isAdmin) {
-            await postToDelete.deleteOne();
-            res.status(200).json({ message: "the post has been deleted" });
-        }
-        else {
-            return res.status(403).json({ message: "you can delete only your post" });
-        }
+        // Suppression du post
+        await PostRepository_1.default.deletePost(postId);
+        res.status(200).json({ message: "the post has been deleted" });
     }
     catch (err) {
         return res.status(500).json({ message: "An error occurred while deleting the post" });
     }
 };
 exports.deletePost = deletePost;
-// like/dislike a post
+/**
+ * Fonction pour liker ou disliker un post
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const likePost = async (req, res) => {
-    const userId = req.user?.pseudo;
-    if (!userId)
-        return res.status(404).json({ message: "currentUser not found." });
+    // Vérification des données de like ou dislike du post
+    const CheckLikePostResult = await (0, postValidations_1.CheckLikePost)(req);
+    // Récupération du post, de l'id du post et de l'id de l'utilisateur
+    const post = CheckLikePostResult.post;
+    const postId = CheckLikePostResult.postId;
+    const userId = CheckLikePostResult.userId;
+    if (CheckLikePostResult.status !== 200) {
+        return res.status(CheckLikePostResult.status).json({ message: CheckLikePostResult.message });
+    }
     try {
-        const postToLike = await PostModel_1.default.findById(req.body._id);
-        if (!postToLike)
-            return res.status(404).json({ message: "Post not found." });
-        if (!postToLike.likes.includes(userId)) {
-            await postToLike.updateOne({ $push: { likes: userId } });
+        // Si l'utilisateur n'a pas déjà liké le post, il le like, sinon il le dislike
+        if (!post.likes?.includes(userId)) {
+            // Like du post
+            await PostRepository_1.default.likePost(postId, userId);
             res.status(200).json("The post has been liked");
         }
         else {
-            await postToLike.updateOne({ $pull: { likes: userId } });
+            // Dislike du post
+            await PostRepository_1.default.unlikePost(postId, userId);
             res.status(200).json("The post has been disliked");
         }
     }

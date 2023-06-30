@@ -1,5 +1,5 @@
-import UserModel from '../../models/UserModel';
-import { IUser } from '../../models/_interfaces/UserInterfaces';
+import UserModel from '../models/UserModel';
+import { IUser } from '../models/_interfaces/UserInterfaces';
 
 class UserRepository {
     /**

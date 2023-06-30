@@ -7,10 +7,10 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const usersRoute_1 = __importDefault(require("./presentation/routes/usersRoute"));
-const authRoute_1 = __importDefault(require("./presentation/routes/authRoute"));
-const postsRoute_1 = __importDefault(require("./presentation/routes/postsRoute"));
-const DBConnection_1 = require("./dal/DBConnection");
+const usersRoute_1 = __importDefault(require("./controllers/routes/usersRoute"));
+const authRoute_1 = __importDefault(require("./controllers/routes/authRoute"));
+const postsRoute_1 = __importDefault(require("./controllers/routes/postsRoute"));
+const DBConnection_1 = require("./connection/DBConnection");
 // Instanciation de l'application express
 const app = (0, express_1.default)();
 // Ajout du middleware body-parser pour parser les requêtes en JSON

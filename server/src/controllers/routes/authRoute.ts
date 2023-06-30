@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { registerUser, loginUser, checkAuth, logoutUser } from '../controllers/authController';
+import { registerUser, loginUser, checkAuth, logoutUser } from '../authController';
 import auth from '../middlewares/authMiddleware';
 
 // Création du routeur

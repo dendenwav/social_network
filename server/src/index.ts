@@ -3,11 +3,11 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
-import usersRoute from './presentation/routes/usersRoute';
-import authRoute from './presentation/routes/authRoute';
-import postsRoute from './presentation/routes/postsRoute';
+import usersRoute from './controllers/routes/usersRoute';
+import authRoute from './controllers/routes/authRoute';
+import postsRoute from './controllers/routes/postsRoute';
 
-import { DBConnection } from './dal/DBConnection';
+import { DBConnection } from './connection/DBConnection';
 
 // Instanciation de l'application express
 const app = express();

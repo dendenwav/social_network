@@ -4,12 +4,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.unfollowUser = exports.followUser = exports.deleteUser = exports.updateUser = exports.getUser = exports.getUsers = void 0;
+const userRepository_1 = __importDefault(require("./../repositories/userRepository"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const UserModel_js_1 = __importDefault(require("../models/UserModel.js"));
-//get users
+const userValidations_1 = require("./validations/userValidations");
+/**
+ * Fonction pour obtenir tous les utilisateurs
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const getUsers = async (req, res) => {
     try {
-        const users = await UserModel_js_1.default.find({}, { email: 0, password: 0, updatedAt: 0 });
+        // Récupération de tous les utilisateurs sans les champs email, password et updatedAt
+        const users = await userRepository_1.default.getUsers({ email: 0, password: 0, updatedAt: 0 });
         res.status(200).json(users);
     }
     catch (err) {
@@ -18,148 +24,122 @@ const getUsers = async (req, res) => {
     }
 };
 exports.getUsers = getUsers;
-//get a user
+/**
+ * Fonction pour obtenir un utilisateur par son id
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const getUser = async (req, res) => {
-    const pseudo = req.params.id;
-    try {
-        const user = await UserModel_js_1.default.findOne({ pseudo });
-        if (!user)
-            return res.status(404).json({ error: "User not found" });
-        const { email, password, updatedAt, ...other } = user._doc;
-        res.status(200).json(other);
+    // Vérification des données de récupération de l'utilisateur
+    const CheckGetUserResult = await (0, userValidations_1.CheckGetUser)(req);
+    // Récupération de l'utilisateur
+    const user = CheckGetUserResult.user;
+    if (CheckGetUserResult.status !== 200) {
+        return res.status(CheckGetUserResult.status).json({ message: CheckGetUserResult.message });
     }
-    catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Could not retrieve user" });
-    }
+    res.status(200).json(user);
 };
 exports.getUser = getUser;
-//update user
+/**
+ * Fonction pour modifier un utilisateur
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const updateUser = async (req, res) => {
+    // Vérification des données de modification de l'utilisateur
+    const CheckUpdateUserResult = await (0, userValidations_1.CheckUpdateUser)(req);
+    // Récupération de l'utilisateur à modifier
+    const userToUpdate = CheckUpdateUserResult.user;
+    if (CheckUpdateUserResult.status !== 200) {
+        return res.status(CheckUpdateUserResult.status).json({ message: CheckUpdateUserResult.message });
+    }
     try {
-        const currentUser = await UserModel_js_1.default.findOne({ pseudo: req.user?.pseudo });
-        if (!currentUser)
-            return res.status(404).json({ message: "currentUser not found." });
-        const userToUpdate = await UserModel_js_1.default.findOne({ pseudo: req.body.userId });
-        if (!userToUpdate)
-            return res.status(404).json({ message: "User not found." });
-        if (currentUser.pseudo === userToUpdate.pseudo || currentUser.isAdmin) {
-            const updates = {};
-            for (const [key, value] of Object.entries(req.body)) {
-                if (key !== "userId" && key !== "isAdmin") {
-                    updates[key] = value;
-                }
+        // Création de l'objet de mise à jour
+        const updates = userToUpdate;
+        // Parcours des données à modifier
+        for (const [key, value] of Object.entries(req.body)) {
+            // Exclusion des données à ne pas modifier
+            if (key !== "userId" && key !== "isAdmin") {
+                updates[key] = value;
             }
-            if (updates.password) {
-                try {
-                    const salt = await bcrypt_1.default.genSalt(10);
-                    updates.password = await bcrypt_1.default.hash(updates.password, salt);
-                }
-                catch (err) {
-                    console.error(err);
-                    return res.status(500).json({ error: "Could not hash password" });
-                }
-            }
+        }
+        // Vérifie si le mot de passe a été modifié
+        if (updates.password) {
             try {
-                const userUpdated = await userToUpdate.updateOne({ $set: updates });
-                if (!userUpdated)
-                    return res.status(404).json({ error: "User not found ? (bizarre...)" });
-                res.status(200).json({ message: "Account has been updated" });
+                // Hashage du mot de passe
+                const salt = await bcrypt_1.default.genSalt(10);
+                updates.password = await bcrypt_1.default.hash(updates.password, salt);
             }
             catch (err) {
                 console.error(err);
-                return res.status(500).json({ error: "Could not update user" });
+                return res.status(500).json({ error: "Could not hash password" });
             }
         }
-        else {
-            return res.status(403).json({ error: "You can only update your own account" });
-        }
+        // Mise à jour de l'utilisateur
+        await userRepository_1.default.updateUser(updates);
+        res.status(200).json({ message: "Account has been updated" });
     }
     catch (error) {
         return res.status(500).json({ message: "An error occurred while updating the user" });
     }
 };
 exports.updateUser = updateUser;
-//delete user
+/**
+ * Fonction pour supprimer un utilisateur
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const deleteUser = async (req, res) => {
+    // Vérification des données de suppression de l'utilisateur
+    const CheckDeleteUserResult = await (0, userValidations_1.CheckDeleteUser)(req);
+    // Récupération du pseudo de l'utilisateur à supprimer
+    const pseudo = CheckDeleteUserResult.pseudo;
     try {
-        const currentUser = await UserModel_js_1.default.findOne({ pseudo: req.user?.pseudo });
-        if (!currentUser)
-            return res.status(404).json({ message: "currentUser not found." });
-        const userToDelete = await UserModel_js_1.default.findOne({ pseudo: req.params.id });
-        if (!userToDelete)
-            return res.status(404).json({ message: "User not found." });
-        if (currentUser.pseudo === userToDelete.pseudo || currentUser.isAdmin) {
-            await UserModel_js_1.default.findOneAndDelete({ pseudo: userToDelete.pseudo });
-            return res.status(200).json({ message: "Account has been deleted." });
-        }
-        else {
-            return res.status(403).json({ message: "You can delete only your account." });
-        }
+        // Suppression de l'utilisateur
+        await userRepository_1.default.deleteUser(pseudo);
+        return res.status(200).json({ message: "Account has been deleted." });
     }
     catch (err) {
         return res.status(500).json({ message: "An error occurred while deleting the user" });
     }
 };
 exports.deleteUser = deleteUser;
-//follow a user
+/**
+ * Fonction pour suivre un utilisateur
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const followUser = async (req, res) => {
+    // Vérification des données de suivi de l'utilisateur
+    const CheckFollowUserResult = await (0, userValidations_1.CheckFollowUser)(req);
+    // Récupération du pseudo de l'utilisateur courant et de l'utilisateur à suivre
+    const currentPseudo = CheckFollowUserResult.currentPseudo;
+    const userToFollowPseudo = CheckFollowUserResult.userToFollowPseudo;
     try {
-        const currentUser = await UserModel_js_1.default.findOne({ pseudo: req.user?.pseudo });
-        if (!currentUser)
-            return res.status(404).json({ message: "currentUser not found." });
-        const userToFollow = await UserModel_js_1.default.findOne({ pseudo: req.params.id });
-        if (!userToFollow)
-            return res.status(404).json({ message: "User not found." });
-        if (currentUser.pseudo === userToFollow.pseudo)
-            return res.status(403).json({ message: "You can't follow yourself." });
-        if (!currentUser.followings.includes(userToFollow.pseudo) && !userToFollow.followers.includes(currentUser.pseudo)) {
-            await currentUser.updateOne({ $push: { followings: userToFollow.pseudo } });
-            await userToFollow.updateOne({ $push: { followers: currentUser.pseudo } });
-            return res.status(200).json({ message: "User has been followed." });
-        }
-        else if (currentUser.followings.includes(userToFollow.pseudo) && userToFollow.followers.includes(currentUser.pseudo)) {
-            return res.status(403).json({ message: "You already follow this user." });
-        }
-        else {
-            if (currentUser.followings.includes(userToFollow.pseudo))
-                await currentUser.updateOne({ $pull: { followings: userToFollow.pseudo } });
-            if (userToFollow.followers.includes(currentUser.pseudo))
-                await userToFollow.updateOne({ $pull: { followers: currentUser.pseudo } });
-            return res.status(500).json({ message: "A data inconsistency has occurred. By default, you won't follow the user you're trying to follow. Please retry the operation if you really want to follow it." });
-        }
+        // Ajout de l'utilisateur à suivre dans la liste des utilisateurs suivis et de l'utilisateur courant dans la liste des utilisateurs qui suivent
+        await userRepository_1.default.followUser(currentPseudo, userToFollowPseudo);
+        return res.status(200).json({ message: "User has been followed." });
     }
     catch (err) {
         return res.status(500).json({ message: "An error occurred while following to this user." });
     }
 };
 exports.followUser = followUser;
-//unfollow a user
+/**
+ * Fonction pour ne plus suivre un utilisateur
+ * @param req - L'objet Request de la requête
+ * @param res - L'objet Response pour renvoyer la réponse
+ */
 const unfollowUser = async (req, res) => {
+    // Vérification des données de suivi de l'utilisateur
+    const CheckFollowUserResult = await (0, userValidations_1.CheckFollowUser)(req);
+    // Récupération du pseudo de l'utilisateur courant et de l'utilisateur à suivre
+    const currentPseudo = CheckFollowUserResult.currentPseudo;
+    const userToUnfollowPseudo = CheckFollowUserResult.userToFollowPseudo;
     try {
-        const currentUser = await UserModel_js_1.default.findOne({ pseudo: req.user?.pseudo });
-        if (!currentUser)
-            return res.status(404).json({ message: "currentUser not found." });
-        const userToUnfollow = await UserModel_js_1.default.findOne({ pseudo: req.params.id });
-        if (!userToUnfollow)
-            return res.status(404).json({ message: "User not found." });
-        if (currentUser.pseudo === userToUnfollow.pseudo)
-            return res.status(403).json({ message: "You can't unfollow yourself." });
-        if (currentUser.followings.includes(userToUnfollow.pseudo) && userToUnfollow.followers.includes(currentUser.pseudo)) {
-            await currentUser.updateOne({ $pull: { followings: userToUnfollow.pseudo } });
-            await userToUnfollow.updateOne({ $pull: { followers: currentUser.pseudo } });
-            return res.status(200).json({ message: "User has been unfollowed." });
-        }
-        else if (!currentUser.followings.includes(userToUnfollow.pseudo) && !userToUnfollow.followers.includes(currentUser.pseudo)) {
-            return res.status(403).json({ message: "You already don't follow this user." });
-        }
-        else {
-            if (currentUser.followings.includes(userToUnfollow.pseudo))
-                await currentUser.updateOne({ $pull: { followings: userToUnfollow.pseudo } });
-            if (userToUnfollow.followers.includes(currentUser.pseudo))
-                await userToUnfollow.updateOne({ $pull: { followers: currentUser.pseudo } });
-            return res.status(500).json({ message: "A data inconsistency has occurred. By default, you won't follow the user you're trying to follow." });
-        }
+        // Suppression de l'utilisateur à suivre dans la liste des utilisateurs suivis et de l'utilisateur courant dans la liste des utilisateurs qui suivent
+        await userRepository_1.default.unfollowUser(currentPseudo, userToUnfollowPseudo);
+        return res.status(200).json({ message: "User has been unfollowed." });
     }
     catch (err) {
         return res.status(500).json({ message: "An error occurred while following to this user." });

@@ -1,9 +1,9 @@
-import UserRepository from "../../dal/repositories/userRepository";
+import UserRepository from "./../repositories/userRepository";
 
 import { Request, Response } from "express";
 import bcrypt from 'bcrypt';
-import { IUser } from "../../models/_interfaces/UserInterfaces";
-import { CheckDeleteUser, CheckFollowUser, CheckGetUser, CheckUpdateUser } from "../validations/userValidations";
+import { IUser } from "./../models/_interfaces/UserInterfaces";
+import { CheckDeleteUser, CheckFollowUser, CheckGetUser, CheckUpdateUser } from "./validations/userValidations";
 
 /**
  * Fonction pour obtenir tous les utilisateurs

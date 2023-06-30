@@ -4,13 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const authController_1 = require("../authController");
+const usersController_1 = require("../usersController");
 const authMiddleware_1 = __importDefault(require("../middlewares/authMiddleware"));
 // Création du routeur
 const router = express_1.default.Router();
 // Définition des routes
-router.post("/register", authController_1.registerUser);
-router.post("/login", authController_1.loginUser);
-router.get("/logout", authMiddleware_1.default, authController_1.logoutUser);
-router.get("/", authMiddleware_1.default, authController_1.checkAuth);
+router.get("/", usersController_1.getUsers);
+router.get("/:id", usersController_1.getUser);
+router.put("/", authMiddleware_1.default, usersController_1.updateUser);
+router.delete("/:id", authMiddleware_1.default, usersController_1.deleteUser);
+router.put("/follow/:id", authMiddleware_1.default, usersController_1.followUser);
+router.put("/unfollow/:id", authMiddleware_1.default, usersController_1.unfollowUser);
 exports.default = router;

@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 
-import PostRepository from "../../dal/repositories/PostRepository";
-import UserRepository from "../../dal/repositories/userRepository";
-import { CheckCreatePost, CheckDeletePost, CheckGetFriendsPosts, CheckGetPost, CheckGetUserPosts, CheckLikePost, CheckUpdatePost } from "../validations/postValidations";
-import { IPost } from "../../models/_interfaces/PostsInterfaces";
+import PostRepository from "./../repositories/PostRepository";
+import { CheckCreatePost, CheckDeletePost, CheckGetFriendsPosts, CheckGetPost, CheckGetUserPosts, CheckLikePost, CheckUpdatePost } from "./validations/postValidations";
+import { IPost } from "./../models/_interfaces/PostsInterfaces";
 
 /**
  * Fonction pour obtenir tous les posts

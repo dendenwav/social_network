@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { updateUser, deleteUser, getUser, getUsers, followUser, unfollowUser } from '../controllers/usersController';
+import { updateUser, deleteUser, getUser, getUsers, followUser, unfollowUser } from '../usersController';
 import auth from '../middlewares/authMiddleware';
 
 // Création du routeur

@@ -1,5 +1,5 @@
-import PostModel from '../../models/PostModel';
-import { IPost } from '../../models/_interfaces/PostsInterfaces';
+import PostModel from '../models/PostModel';
+import { IPost } from '../models/_interfaces/PostsInterfaces';
 
 class PostRepository {
   /**
