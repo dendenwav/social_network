@@ -1,23 +1,27 @@
 import PostModel from '../models/PostModel';
 import { IPost } from '../models/_interfaces/PostsInterfaces';
+import { StaticImplements } from './Utility';
+import { IPostRepository } from './IPostRepository';
 
-class PostRepository {
+@StaticImplements<IPostRepository>()
+export class PostRepository {
+
   /**
    * Crée un nouveau post
    * @param PostData - Données du post à créer
    * @returns Le post créé
    */
-  public static async createPost(PostData: IPost): Promise<IPost> {
+  static async createPost(PostData: IPost): Promise<IPost> {
     const newPost = new PostModel(PostData);
-    return newPost.save();
+    return await newPost.save();
   }
 
   /**
    * Récupère tous les posts
    * @returns Une liste de tous les posts
    */
-  public static async getPosts(): Promise<IPost[]> {
-    return PostModel.find();
+  static async getPosts(): Promise<IPost[]> {
+    return await PostModel.find();
   }
 
   /**
@@ -25,8 +29,8 @@ class PostRepository {
    * @param pseudo - Pseudo de l'utilisateur
    * @returns Une liste des posts de l'utilisateur spécifié
    */
-  public static async getUserPosts(pseudo: string): Promise<IPost[]> {
-    return PostModel.find({ userId: pseudo }).sort({ createdAt: -1 });
+  static async getUserPosts(pseudo: string): Promise<IPost[]> {
+    return await PostModel.find({ userId: pseudo }).sort({ createdAt: -1 });
   }
 
   /**
@@ -34,8 +38,8 @@ class PostRepository {
    * @param postId - Identifiant du post
    * @returns Le post correspondant à l'identifiant donné
    */
-  public static async getPostById(postId: string): Promise<IPost | null> {
-    return PostModel.findById(postId);
+  static async getPostById(postId: string): Promise<IPost | null> {
+    return await PostModel.findById(postId);
   }
 
   /**
@@ -43,8 +47,8 @@ class PostRepository {
    * @param updatedPostData - Données mises à jour du post
    * @returns Le post mis à jour
    */
-  public static async updatePost(updatedPostData: IPost): Promise<IPost | null> {
-    return PostModel.findByIdAndUpdate(updatedPostData.postId, updatedPostData, { new: true });
+  static async updatePost(updatedPostData: IPost): Promise<IPost | null> {
+    return await PostModel.findByIdAndUpdate(updatedPostData.postId, updatedPostData, { new: true });
   }
 
   /**
@@ -52,8 +56,8 @@ class PostRepository {
    * @param postId - Identifiant du post à supprimer
    * @returns Le post supprimé
    */
-  public static async deletePost(postId: string): Promise<IPost | null> {
-    return PostModel.findByIdAndDelete(postId);
+  static async deletePost(postId: string): Promise<IPost | null> {
+    return await PostModel.findByIdAndDelete(postId);
   }
 
   /**
@@ -62,8 +66,8 @@ class PostRepository {
    * @param userId - Identifiant de l'utilisateur
    * @returns Le post mis à jour
    */
-  public static async likePost(postId: string, userId: string): Promise<IPost | null> {
-    return PostModel.findByIdAndUpdate(postId, { $push: { likes: userId } }, { new: true });
+  static async likePost(postId: string, userId: string): Promise<IPost | null> {
+    return await PostModel.findByIdAndUpdate(postId, { $push: { likes: userId } }, { new: true });
   }
 
   /**
@@ -72,8 +76,8 @@ class PostRepository {
    * @param userId - Identifiant de l'utilisateur
    * @returns Le post mis à jour
    */
-  public static async unlikePost(postId: string, userId: string): Promise<IPost | null> {
-    return PostModel.findByIdAndUpdate(postId, { $pull: { likes: userId } }, { new: true });
+  static async unlikePost(postId: string, userId: string): Promise<IPost | null> {
+    return await PostModel.findByIdAndUpdate(postId, { $pull: { likes: userId } }, { new: true });
   }
 }
 

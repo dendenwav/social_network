@@ -8,7 +8,7 @@ dotenv.config();
  * Établir la connexion à la base de données MongoDB
  * @param app - Instance de l'application Express
  */
-export const DBConnection = async (app: Express) => {
+export const StartConnection = async (app: Express) => {
     try {
         const CONNECTION_URL = process.env.CONNECTION_URL;
         const PORT = process.env.PORT;

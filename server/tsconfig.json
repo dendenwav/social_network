@@ -1,18 +1,27 @@
 {
   "compilerOptions": {
-    /* Visit https://aka.ms/tsconfig to read more about this file */
-
-    "target": "ES2020",                                     /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-    "module": "CommonJS",                             /* Specify what module code is generated. */
-    "outDir": "dist",                                    /* Specify an output folder for all emitted files. */
-    "strict": true,                                      /* Enable all strict type-checking options. */
-    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
-    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
-    "moduleResolution": "Node",
+    "strict": true,
+    "module": "CommonJS",
     "resolveJsonModule": true,
-    "declaration": false,                                 /* Generate .d.ts files from TypeScript and JavaScript files in your project. */
+    "declaration": false,
+    "removeComments": true,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "strictPropertyInitialization": false,
+    "target": "ES2020",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "paths": {
+      "@exceptions": ["src/libs/exceptions"],
+      "@infrastructure": ["src/infrastructure/*"],
+      "@libs": ["src/libs/*"],
+      "@modules": ["src/modules/*"],
+      "@src": ["src/"],
+      "@tests": ["tests/*"],
+    }
   },
   "files": [
     "src/index.ts"

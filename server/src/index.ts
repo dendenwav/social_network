@@ -7,8 +7,6 @@ import usersRoute from './controllers/routes/usersRoute';
 import authRoute from './controllers/routes/authRoute';
 import postsRoute from './controllers/routes/postsRoute';
 
-import { DBConnection } from './connection/DBConnection';
-
 // Instanciation de l'application express
 const app = express();
 
@@ -34,6 +32,3 @@ app.use(cookieParser());
 app.use("/auth", authRoute);
 app.use("/users", usersRoute);
 app.use("/posts", postsRoute);
-
-// Lancement du serveur sur le port 5000
-DBConnection(app);
